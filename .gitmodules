@@ -1,0 +1,6 @@
+[submodule "fauna"]
+	path = fauna
+	url = https://github.com/nextstrain/fauna.git
+[submodule "augur"]
+	path = augur
+	url = https://github.com/nextstrain/augur.git
