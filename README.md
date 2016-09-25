@@ -39,15 +39,9 @@ Enter shell
 
     docker run -t -i --env-file environment_janus.env nextstrain/janus /bin/bash
 
-Download Zika sequences
-
-    cd /janus/fauna
-    python vdb/zika_download.py -db vdb -v zika --fstem zika
-
 Build Zika
 
-    cd /janus/augur
-    python zika/zika.py
+    python build.py
 
 ## License and copyright
 

@@ -23,24 +23,26 @@ RUN apt-get install -y mafft
 # fasttree
 RUN apt-get install -y fasttree
 
-# raxml
-RUN apt-get install -y raxml
-RUN cp /usr/bin/raxmlHPC /usr/bin/raxml
-
 # python modules
-RUN pip install rethinkdb==2.2.0.post2
 RUN pip install biopython==1.68
+RUN pip install matplotlib==1.5.1
+RUN pip install pandas==0.16.2
 RUN pip install geopy==1.11.0
 RUN pip install cvxopt --user
 RUN pip install DendroPy==3.12.0
 RUN pip install boto==2.38.0
-RUN pip install matplotlib==1.5.1
-RUN pip install pandas==0.16.2
 RUN pip install seaborn==0.6.0
+RUN pip install rethinkdb==2.2.0.post2
+
+# raxml
+RUN git clone --branch v8.2.9 https://github.com/stamatak/standard-RAxML.git
+WORKDIR /standard-RAxML
+RUN make -f Makefile.gcc
+RUN cp raxmlHPC /usr/bin/raxml
 
 # treetime
 RUN git clone https://github.com/neherlab/treetime.git /TreeTime
-WORKDIR /TreeTime/
+WORKDIR /TreeTime
 RUN python setup.py install
 WORKDIR /
 
