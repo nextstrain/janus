@@ -15,6 +15,40 @@ nextstrain is comprised of four components:
 
 This repo is intended to ease deployment of nextstrain instances. It's goal is to provide deploy scripts for augur builds.
 
+## Docker commands
+
+Build Docker image
+
+    docker build -t nextstrain/janus:latest .
+
+Push image to hub
+
+    docker push nextstrain/janus:latest
+
+Run a shell from within the container
+
+    docker run -t -i nextstrain/janus /bin/bash
+
+Run a shell from within the container, including environment variables
+
+    docker run -t -i --env-file environment_janus.env nextstrain/janus /bin/bash
+
+## Testing
+
+Enter shell
+
+    docker run -t -i --env-file environment_janus.env nextstrain/janus /bin/bash
+
+Download Zika sequences
+
+    cd /janus/fauna
+    python vdb/zika_download.py -db vdb -v zika --fstem zika
+
+Build Zika
+
+    cd /janus/augur
+    python zika/zika.py
+
 ## License and copyright
 
 Copyright 2016 Trevor Bedford.
