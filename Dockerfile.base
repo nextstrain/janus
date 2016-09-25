@@ -35,6 +35,17 @@ RUN pip install rethinkdb==2.2.0.post2
 RUN git clone --branch v8.2.9 https://github.com/stamatak/standard-RAxML.git
 WORKDIR /standard-RAxML
 RUN make -f Makefile.gcc
+RUN cp raxmlHPC /usr/bin/raxmlHPC
+RUN make -f Makefile.SSE3.gcc
+RUN cp raxmlHPC-SSE3 /usr/bin/raxmlHPC-SSE3
+RUN make -f Makefile.AVX.gcc
+RUN cp raxmlHPC-AVX /usr/bin/raxmlHPC-AVX
+RUN make -f Makefile.PTHREADS.gcc
+RUN cp raxmlHPC-PTHREADS /usr/bin/raxmlHPC-PTHREADS
+RUN make -f Makefile.SSE3.PTHREADS.gcc
+RUN cp raxmlHPC-PTHREADS-SSE3 /usr/bin/raxmlHPC-PTHREADS-SSE3
+RUN make -f Makefile.AVX.PTHREADS.gcc
+RUN cp raxmlHPC-PTHREADS-AVX /usr/bin/raxmlHPC-PTHREADS-AVX
 RUN cp raxmlHPC /usr/bin/raxml
 
 # treetime
