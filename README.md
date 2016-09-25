@@ -17,11 +17,19 @@ This repo is intended to ease deployment of nextstrain instances. It's goal is t
 
 ## Docker commands
 
-Build Docker image
+Build base Docker image
+
+    docker build -t nextstrain/base:latest -f Dockerfile.base .
+
+Push base image to hub
+
+    docker push nextstrain/base:latest
+
+Build janus Docker image
 
     docker build -t nextstrain/janus:latest .
 
-Push image to hub
+Push janus image to hub
 
     docker push nextstrain/janus:latest
 
