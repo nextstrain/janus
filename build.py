@@ -4,7 +4,6 @@ def build(virus, spec):
 	'''
 	run build for single dataset
 	'''
-	print '\n------------------------------\n'
 	print 'Processing ', virus, 'with spec ', spec
 	download_with_fauna(virus, spec)
 	process_with_augur(virus, spec)
