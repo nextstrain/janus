@@ -1,0 +1,9 @@
+{
+    "viruses": {
+        "flu": {
+            "viruses_per_month": {
+                "3y": 2
+            }
+        }
+    }
+}
