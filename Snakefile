@@ -7,7 +7,14 @@ configfile: "config.json"
 # Set snakemake directory
 SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 
+#
+# Helper functions
+#
+
 def _get_json_outputs_by_virus(config):
+    """Prepare a list of outputs for all combination of viruses, lineages, and
+    segments defined in the configuration.
+    """
     outputs = []
     for virus in config["viruses"]:
         for lineage in config["viruses"][virus]:
@@ -16,14 +23,6 @@ def _get_json_outputs_by_virus(config):
                     outputs.append("augur/%s/auspice/%s_%s_%s_%s_meta.json" % (virus, virus, lineage, segment, resolution))
 
     return outputs
-
-rule all:
-    input: _get_json_outputs_by_virus(config)
-
-rule process_virus:
-    input: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
-    output: "augur/{virus}/auspice/{virus}_{lineage}_{segment}_{resolution}_meta.json"
-    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} --no_mut_freqs --no_tree_freqs"
 
 def _get_viruses_per_month(wildcards):
     """Return the number of viruses per month for the given virus, lineage, and
@@ -43,16 +42,31 @@ def _get_sampling_by_virus_lineage(wildcards):
         config["defaults"]["sampling"]
     )
 
-def _get_segments_by_virus_lineage(wildcards):
-    """Return the genomic segments to use for the given virus and lineage.
+def _get_locus(wildcards):
+    """Uppercase the requested segment name for fauna.
     """
-    segments = config["viruses"][wildcards.virus][wildcards.lineage].get("segments")
-    assert segments is not None, "Segments are not defined for %s/%s" % (wildcards.virus, wildcards.lineage)
-    return " ".join(segments)
+    return wildcards.segment.upper()
 
-def _get_sequences_by_virus_lineage(wildcards):
-    return ["fauna/data/%s_%s_%s.fasta" % (wildcards.virus, wildcards.lineage, segment)
-            for segment in _get_segments_by_virus_lineage(wildcards).split()]
+def _get_fauna_lineage(wildcards):
+    """Prepend the 'seasonal_' prefix to seasonal flu strains for fauna when
+    necessary.
+    """
+    if wildcards.virus == "flu" and wildcards.lineage in ["h3n2", "h1n1pdm", "vic", "yam"]:
+        return "seasonal_%s" % wildcards.lineage
+    else:
+        return wildcards.lineage
+
+#
+# Process data with augur
+#
+
+rule all:
+    input: _get_json_outputs_by_virus(config)
+
+rule process_virus:
+    input: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
+    output: "augur/{virus}/auspice/{virus}_{lineage}_{segment}_{resolution}_meta.json"
+    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} --no_mut_freqs --no_tree_freqs"
 
 rule prepare_virus:
     input:
@@ -65,21 +79,13 @@ rule prepare_virus:
               --viruses_per_month_seq {params.viruses_per_month} --titers {SNAKEMAKE_DIR}/{input.titers} \
               --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
 
+#
+# Download data with fauna
+#
+
 rule download_virus_titers:
     output: "fauna/data/{virus}_{lineage}_titers.tsv"
     shell: "cd fauna && python tdb/download.py -db tdb -v {wildcards.virus} --subtype {wildcards.lineage} --select assay_type:hi --fstem {wildcards.virus}_{wildcards.lineage}"
-
-def _get_locus(wildcards):
-    return wildcards.segment.upper()
-
-def _get_fauna_lineage(wildcards):
-    """Prepend the 'seasonal_' prefix to seasonal flu strains for fauna when
-    necessary.
-    """
-    if wildcards.virus == "flu" and wildcards.lineage in ["h3n2", "h1n1pdm", "vic", "yam"]:
-        return "seasonal_%s" % wildcards.lineage
-    else:
-        return wildcards.lineage
 
 rule download_virus_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
