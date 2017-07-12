@@ -51,6 +51,31 @@ Build Zika
 
     python build.py
 
+## Building with Snakemake
+
+Export rethinkdb environment variables and load Anaconda environment.
+
+```bash
+. environment_rethink.sh
+
+source activate janus_python3
+```
+
+Configure which viruses, lineages, and resolutions to build in
+`config.json`. Perform a dry-run of the builds by printing the commands that
+will be executed for the configuration.
+
+```bash
+snakemake -npq
+```
+
+If everything looks good, run builds on the cluster. For example, the following
+command runs no more than 4 builds at a time.
+
+```bash
+snakemake -w 30 -j 4 --cluster-config cluster.json --cluster "sbatch --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time} --job-name='{cluster.name}' --output='{cluster.stdout}' --error='{cluster.stderr}'"
+```
+
 ## License and copyright
 
 Copyright 2016 Trevor Bedford.
