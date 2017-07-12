@@ -53,11 +53,36 @@ Build Zika
 
 ## Building with Snakemake
 
+### Installation
+
+Download and install miniconda.
+
+```bash
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+```
+
+Setup the Anaconda environments.
+
+```bash
+conda env create -f anaconda.augur.yaml
+conda env create -f anaconda.python3.yaml
+```
+
+Create symlinks for binaries with non-standard names.
+
+```bash
+export CONDA_BIN_DIR=$(dirname `which conda`)
+ln -s ${CONDA_BIN_DIR}/raxmlHPC ${CONDA_BIN_DIR}/raxml
+ln -s ${CONDA_BIN_DIR}/FastTree ${CONDA_BIN_DIR}/fasttree
+```
+
+### Usage
+
 Export rethinkdb environment variables and load Anaconda environment.
 
 ```bash
 . environment_rethink.sh
-
 source activate janus_python3
 ```
 
