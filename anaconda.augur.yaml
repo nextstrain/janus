@@ -78,5 +78,3 @@ dependencies:
   - unidecode==0.4.19
   - wcwidth==0.1.7
   - xlrd==1.0.0
-prefix: !!python/unicode '/home/jhuddles/miniconda2/envs/augur'
-
