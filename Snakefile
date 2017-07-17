@@ -91,3 +91,16 @@ rule download_virus_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
     params: locus=_get_locus, fauna_lineage=_get_fauna_lineage
     shell: "cd fauna && python vdb/{wildcards.virus}_download.py -db vdb -v {wildcards.virus} --select locus:{params.locus} lineage:{params.fauna_lineage} --fstem {wildcards.virus}_{wildcards.lineage}_{wildcards.segment}"
+
+#
+# Clean up output files for quick rebuild without redownload
+#
+
+rule clean:
+    params: viruses=list(config["viruses"].keys())
+    shell: """for virus in {params.viruses}
+do
+    rm -f augur/$virus/prepared/$virus*;
+    rm -f augur/$virus/processed/$virus*;
+    rm -f augur/$virus/auspice/$virus*;
+done"""
