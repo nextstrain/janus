@@ -15,6 +15,9 @@
                 },
                 "sampling": "even"
             }
+        },
+        "zika": {
+            "viruses_per_month": 15
         }
     }
 }
