@@ -101,6 +101,12 @@ command runs no more than 4 builds at a time.
 snakemake -w 30 -j 4 --cluster-config cluster.json --cluster "sbatch --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time} --job-name='{cluster.name}' --output='{cluster.stdout}' --error='{cluster.stderr}'"
 ```
 
+Alternately, jobs can be submitted using the DRMAA interface as follows.
+
+```bash
+snakemake -w 30 -j 4 --cluster-config cluster.json --drmaa " --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time}" --jobname "{rulename}.{jobid}.sh"
+```
+
 ## License and copyright
 
 Copyright 2016 Trevor Bedford.
