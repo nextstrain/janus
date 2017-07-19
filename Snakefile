@@ -66,6 +66,7 @@ rule all:
 rule process_virus:
     input: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
     output: "augur/{virus}/auspice/{virus}_{lineage}_{segment}_{resolution}_meta.json"
+    benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} --no_mut_freqs --no_tree_freqs"
 
 rule prepare_virus:
@@ -74,6 +75,7 @@ rule prepare_virus:
         titers="fauna/data/{virus}_{lineage}_titers.tsv"
     output: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
     params: viruses_per_month=_get_viruses_per_month, sampling=_get_sampling_by_virus_lineage
+    benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py --lineage {wildcards.lineage} \
               --resolution {wildcards.resolution} --segments {wildcards.segment} --sampling {params.sampling} \
               --viruses_per_month_seq {params.viruses_per_month} --titers {SNAKEMAKE_DIR}/{input.titers} \
@@ -85,11 +87,13 @@ rule prepare_virus:
 
 rule download_virus_titers:
     output: "fauna/data/{virus}_{lineage}_titers.tsv"
+    benchmark: "benchmarks/fauna_{virus}_{lineage}_titers.txt"
     shell: "cd fauna && python tdb/download.py -db tdb -v {wildcards.virus} --subtype {wildcards.lineage} --select assay_type:hi --fstem {wildcards.virus}_{wildcards.lineage}"
 
 rule download_virus_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
     params: locus=_get_locus, fauna_lineage=_get_fauna_lineage
+    benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
     shell: "cd fauna && python vdb/{wildcards.virus}_download.py -db vdb -v {wildcards.virus} --select locus:{params.locus} lineage:{params.fauna_lineage} --fstem {wildcards.virus}_{wildcards.lineage}_{wildcards.segment}"
 
 #
