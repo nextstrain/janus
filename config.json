@@ -1,22 +1,19 @@
 {
-    "defaults": {
-        "sampling": "even",
-        "viruses_per_month": {
-            "2y": 90,
-            "3y": 60,
-            "6y": 24,
-            "12y": 12
-        }
-    },
     "viruses": {
         "flu": {
+            "lineages": [
+                "h3n2"
+            ],
             "h3n2": {
                 "resolutions": ["3y", "6y"],
                 "segments": ["ha"],
                 "viruses_per_month": {
-                    "3y": 2,
-                    "6y": 2
-                }
+                    "2y": 90,
+                    "3y": 60,
+                    "6y": 24,
+                    "12y": 12
+                },
+                "sampling": "even"
             }
         }
     }
