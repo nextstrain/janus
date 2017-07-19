@@ -3,6 +3,7 @@ import sys
 
 shell.prefix("source activate augur; ")
 configfile: "config.json"
+localrules: download_virus_titers, download_virus_sequences
 
 # Set snakemake directory
 SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
