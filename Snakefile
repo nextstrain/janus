@@ -3,7 +3,7 @@ import sys
 
 shell.prefix("source activate augur; ")
 configfile: "config.json"
-localrules: download_virus_titers, download_virus_sequences
+localrules: download_virus_lineage_titers, download_virus_lineage_sequences, download_complete_virus_sequences
 wildcard_constraints:
     virus="[a-zA-Z0-9]+"
 
