@@ -18,6 +18,9 @@
         },
         "zika": {
             "viruses_per_month": 15
+        },
+        "ebola": {
+            "viruses_per_month": 100
         }
     }
 }
