@@ -52,6 +52,15 @@ def _get_viruses_per_month(wildcards):
 
     return viruses_per_month
 
+def _get_resolution_argument_by_virus_lineage(wildcards):
+    """Return the resolution to use for the given virus and lineage. The
+    default is not to define any resolution argument.
+    """
+    if hasattr(wildcards, "resolution") and wildcards.resolution != "all":
+        return "--resolution %s" % wildcards.resolution
+    else:
+        return ""
+
 def _get_sampling_argument_by_virus_lineage(wildcards):
     """Return the type of sampling to use for the given virus and lineage. The
     default is not to define any sampling argument.
@@ -96,10 +105,11 @@ rule prepare_virus_lineage:
     output: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
     params:
         viruses_per_month=_get_viruses_per_month,
+        resolution=_get_resolution_argument_by_virus_lineage,
         sampling=_get_sampling_argument_by_virus_lineage
     benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py --lineage {wildcards.lineage} \
-              --resolution {wildcards.resolution} --segments {wildcards.segment} {params.sampling} \
+              {params.resolution} --segments {wildcards.segment} {params.sampling} \
               --viruses_per_month_seq {params.viruses_per_month} --titers {SNAKEMAKE_DIR}/{input.titers} \
               --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
 
