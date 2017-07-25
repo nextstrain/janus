@@ -80,6 +80,15 @@ def _get_sampling_argument_by_virus_lineage(wildcards):
     else:
         return ""
 
+def _get_segment_argument_by_virus_lineage(wildcards):
+    """Return the segment to use for the given virus and lineage. The default is to
+    not define any segment.
+    """
+    if hasattr(wildcards, "segment") and wildcards.segment != "all":
+        return "--segments %s" % wildcards.segment
+    else:
+        return ""
+
 def _get_locus(wildcards):
     """Uppercase the requested segment name for fauna.
     """
@@ -134,11 +143,12 @@ rule prepare_virus_lineage:
         lineage=_get_lineage_argument_by_virus_lineage,
         viruses_per_month=_get_viruses_per_month,
         resolution=_get_resolution_argument_by_virus_lineage,
+        segment=_get_segment_argument_by_virus_lineage,
         sampling=_get_sampling_argument_by_virus_lineage,
         titers=_get_titers_argument_by_virus_lineage
     benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py {params.lineage} \
-              {params.resolution} --segments {wildcards.segment} {params.sampling} \
+              {params.resolution} {params.segment} {params.sampling} \
               --viruses_per_month_seq {params.viruses_per_month} {params.titers} \
               --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
 
