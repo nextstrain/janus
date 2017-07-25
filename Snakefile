@@ -112,19 +112,53 @@ def _get_segment_argument_by_virus_lineage(wildcards):
     else:
         return ""
 
-def _get_locus(wildcards):
-    """Uppercase the requested segment name for fauna.
+def _get_locus_argument(wildcards):
+    """If the current virus/lineage has a defined segment, uppercase the requested
+    segment name for fauna.
     """
-    return wildcards.segment.upper()
+    if hasattr(wildcards, "segment") and wildcards.segment != "all":
+        return "--select locus:%s" % wildcards.segment.upper()
+    else:
+        return ""
 
-def _get_fauna_lineage(wildcards):
-    """Prepend the 'seasonal_' prefix to seasonal flu strains for fauna when
+def _get_fauna_lineage_argument(wildcards):
+    """If the current virus has a defined lineage and the virus is seasonal flu,
+    prepend the 'seasonal_' prefix to seasonal flu strains for fauna when
     necessary.
     """
     if wildcards.virus == "flu" and wildcards.lineage in ["h3n2", "h1n1pdm", "vic", "yam"]:
-        return "seasonal_%s" % wildcards.lineage
+        fauna_lineage = "seasonal_%s" % wildcards.lineage
+    elif wildcards.lineage != "all":
+        fauna_lineage = wildcards.lineage
     else:
-        return wildcards.lineage
+        fauna_lineage = None
+
+    if fauna_lineage is not None:
+        return "--select lineage:%s" % fauna_lineage
+    else:
+        return ""
+
+def _get_fstem_argument(wildcards):
+    """Return the filename stem for the current virus without including any wildcard
+    parameters matching "all".
+
+    For example, if the wildcards define a virus, lineage, and segment for Zika
+    like `["zika", "all", "all"]`, then the fstem should just be "zika". If the
+    wildcards are for flu's H3N2 HA segment, then the fstem should be
+    "flu_h3n2_ha".
+    """
+    return "--fstem %s" % "_".join([wildcard
+                                    for wildcard in [wildcards.virus, wildcards.lineage, wildcards.segment]
+                                    if wildcard != "all"])
+
+def _get_resolve_method(wildcards):
+    """Return a resolve_method argument for fauna sequence downloads if one has been
+    defined for the given virus.
+    """
+    if "resolve_method" in config["viruses"][wildcards.virus]:
+        return "--resolve_method %s" % config["viruses"][wildcards.virus]["resolve_method"]
+    else:
+        return ""
 
 def _get_process_arguments(wildcards):
     """Return any custom arguments the user has defined in the configuration for the
@@ -224,9 +258,13 @@ rule download_virus_lineage_titers:
 
 rule download_virus_lineage_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
-    params: locus=_get_locus, fauna_lineage=_get_fauna_lineage
+    params:
+        locus=_get_locus_argument,
+        fauna_lineage=_get_fauna_lineage_argument,
+        fstem=_get_fstem_argument,
+        resolve_method=_get_resolve_method
     benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
-    shell: "cd fauna && python vdb/{wildcards.virus}_download.py -db vdb -v {wildcards.virus} --select locus:{params.locus} lineage:{params.fauna_lineage} --fstem {wildcards.virus}_{wildcards.lineage}_{wildcards.segment}"
+    shell: "cd fauna && python vdb/{wildcards.virus}_download.py -db vdb -v {wildcards.virus} {params.locus} {params.fstem} {params.resolve_method}"
 
 rule download_complete_virus_sequences:
     output: "fauna/data/{virus}.fasta"
