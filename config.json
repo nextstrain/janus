@@ -23,10 +23,12 @@
             }
         },
         "zika": {
-            "viruses_per_month": 15
+            "viruses_per_month": 15,
+            "resolve_method": "choose_genbank"
         },
         "ebola": {
-            "viruses_per_month": 100
+            "viruses_per_month": 100,
+            "resolve_method": "choose_genbank"
         },
         "h7n9": {
             "viruses_per_month": 0,
