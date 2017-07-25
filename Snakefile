@@ -229,25 +229,6 @@ rule prepare_virus_lineage:
               --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
 
 #
-# Prepare and process complete viruses without lineages.
-#
-
-rule process_complete_virus:
-    input: "augur/{virus}/prepared/{virus}.json"
-    output: "augur/{virus}/auspice/{virus}_meta.json"
-    benchmark: "benchmarks/process/{virus}.txt"
-    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py"
-
-rule prepare_complete_virus:
-    input: sequences="fauna/data/{virus}.fasta"
-    output: "augur/{virus}/prepared/{virus}.json"
-    params: viruses_per_month=_get_viruses_per_month
-    benchmark: "benchmarks/prepare/{virus}.txt"
-    shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py #\
-              #--viruses_per_month_seq {params.viruses_per_month} \
-              #--sequences {SNAKEMAKE_DIR}/{input.sequences}"""
-
-#
 # Download data with fauna
 #
 
@@ -265,11 +246,6 @@ rule download_virus_lineage_sequences:
         resolve_method=_get_resolve_method
     benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
     shell: "cd fauna && python vdb/{wildcards.virus}_download.py -db vdb -v {wildcards.virus} {params.locus} {params.fstem} {params.resolve_method}"
-
-rule download_complete_virus_sequences:
-    output: "fauna/data/{virus}.fasta"
-    benchmark: "benchmarks/fauna_{virus}_fasta.txt"
-    shell: "cd fauna && python vdb/{wildcards.virus}_download.py -db vdb -v {wildcards.virus} --fstem {wildcards.virus} --resolve_method choose_genbank"
 
 #
 # Clean up output files for quick rebuild without redownload
