@@ -233,12 +233,13 @@ rule download_virus_lineage_titers:
 rule download_virus_lineage_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
     params:
+        virus=lambda wildcards: wildcards.virus.lower(),
         locus=_get_locus_argument,
         fauna_lineage=_get_fauna_lineage_argument,
         fstem=_get_fstem_argument,
         resolve_method=_get_resolve_method
     benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
-    shell: "cd fauna && python vdb/{wildcards.virus}_download.py -db vdb -v {wildcards.virus} {params.locus} {params.fstem} {params.resolve_method}"
+    shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.locus} {params.fstem} {params.resolve_method}"
 
 #
 # Clean up output files for quick rebuild without redownload
