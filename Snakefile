@@ -144,20 +144,6 @@ def _get_process_arguments(wildcards):
     else:
         return ""
 
-rule all:
-    input: _get_json_outputs_by_virus(config)
-
-#
-# Prepare and process viruses by lineage.
-#
-
-rule process_virus_lineage:
-    input: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
-    output: "augur/{virus}/auspice/{virus}_{lineage}_{segment}_{resolution}_meta.json"
-    params: process_arguments=_get_process_arguments
-    benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
-    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} {params.process_arguments}"
-
 def _get_prepare_inputs_by_virus_lineage(wildcards):
     """Determine which inputs should be built for the given virus/lineage especially
     in the case when a virus may have titers available.
@@ -177,6 +163,20 @@ def _get_titers_argument_by_virus_lineage(wildcards, input):
         return "--titers %s" % os.path.join(SNAKEMAKE_DIR, input.titers)
     else:
         return ""
+
+rule all:
+    input: _get_json_outputs_by_virus(config)
+
+#
+# Prepare and process viruses by lineage.
+#
+
+rule process_virus_lineage:
+    input: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
+    output: "augur/{virus}/auspice/{virus}_{lineage}_{segment}_{resolution}_meta.json"
+    params: process_arguments=_get_process_arguments
+    benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
+    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} {params.process_arguments}"
 
 rule prepare_virus_lineage:
     input: unpack(_get_prepare_inputs_by_virus_lineage)
