@@ -52,11 +52,15 @@ def _get_viruses_per_month(wildcards):
 
     return viruses_per_month
 
-def _get_sampling_by_virus_lineage(wildcards):
-    """Return the type of sampling to use for the given virus and lineage. Use
-    default if no specific sampling is defined.
+def _get_sampling_argument_by_virus_lineage(wildcards):
+    """Return the type of sampling to use for the given virus and lineage. The
+    default is not to define any sampling argument.
     """
-    return config["viruses"][wildcards.virus][wildcards.lineage]["sampling"]
+    sampling = config["viruses"][wildcards.virus].get(wildcards.lineage, {}).get("sampling")
+    if sampling is not None:
+        return "--sampling %s" % sampling
+    else:
+        return ""
 
 def _get_locus(wildcards):
     """Uppercase the requested segment name for fauna.
@@ -90,10 +94,12 @@ rule prepare_virus_lineage:
         sequences="fauna/data/{virus}_{lineage}_{segment}.fasta",
         titers="fauna/data/{virus}_{lineage}_titers.tsv"
     output: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
-    params: viruses_per_month=_get_viruses_per_month, sampling=_get_sampling_by_virus_lineage
+    params:
+        viruses_per_month=_get_viruses_per_month,
+        sampling=_get_sampling_argument_by_virus_lineage
     benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py --lineage {wildcards.lineage} \
-              --resolution {wildcards.resolution} --segments {wildcards.segment} --sampling {params.sampling} \
+              --resolution {wildcards.resolution} --segments {wildcards.segment} {params.sampling} \
               --viruses_per_month_seq {params.viruses_per_month} --titers {SNAKEMAKE_DIR}/{input.titers} \
               --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
 
