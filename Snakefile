@@ -99,6 +99,9 @@ rule process_virus_lineage:
     shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} --no_mut_freqs --no_tree_freqs"
 
 def _get_prepare_inputs_by_virus_lineage(wildcards):
+    """Determine which inputs should be built for the given virus/lineage especially
+    in the case when a virus may have titers available.
+    """
     inputs = {"sequences": "fauna/data/{wildcards.virus}_{wildcards.lineage}_{wildcards.segment}.fasta".format(wildcards=wildcards)}
 
     if config["viruses"][wildcards.virus][wildcards.lineage].get("has_titers", False):
