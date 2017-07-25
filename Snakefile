@@ -98,19 +98,35 @@ rule process_virus_lineage:
     benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} --no_mut_freqs --no_tree_freqs"
 
+def _get_prepare_inputs_by_virus_lineage(wildcards):
+    inputs = {"sequences": "fauna/data/{wildcards.virus}_{wildcards.lineage}_{wildcards.segment}.fasta".format(wildcards=wildcards)}
+
+    if config["viruses"][wildcards.virus][wildcards.lineage].get("has_titers", False):
+        inputs["titers"] = "fauna/data/{wildcards.virus}_{wildcards.lineage}_titers.tsv".format(wildcards=wildcards)
+
+    return inputs
+
+def _get_titers_argument_by_virus_lineage(wildcards, input):
+    """Return a prepare argument for titers if the current virus/lineage has
+    available titers.
+    """
+    if hasattr(input, "titers"):
+        return "--titers %s" % os.path.join(SNAKEMAKE_DIR, input.titers)
+    else:
+        return ""
+
 rule prepare_virus_lineage:
-    input:
-        sequences="fauna/data/{virus}_{lineage}_{segment}.fasta",
-        titers="fauna/data/{virus}_{lineage}_titers.tsv"
+    input: unpack(_get_prepare_inputs_by_virus_lineage)
     output: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
     params:
         viruses_per_month=_get_viruses_per_month,
         resolution=_get_resolution_argument_by_virus_lineage,
-        sampling=_get_sampling_argument_by_virus_lineage
+        sampling=_get_sampling_argument_by_virus_lineage,
+        titers=_get_titers_argument_by_virus_lineage
     benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py --lineage {wildcards.lineage} \
               {params.resolution} --segments {wildcards.segment} {params.sampling} \
-              --viruses_per_month_seq {params.viruses_per_month} --titers {SNAKEMAKE_DIR}/{input.titers} \
+              --viruses_per_month_seq {params.viruses_per_month} {params.titers} \
               --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
 
 #
