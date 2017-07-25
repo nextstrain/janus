@@ -139,17 +139,10 @@ def _get_fauna_lineage_argument(wildcards):
         return ""
 
 def _get_fstem_argument(wildcards):
-    """Return the filename stem for the current virus without including any wildcard
-    parameters matching "all".
-
-    For example, if the wildcards define a virus, lineage, and segment for Zika
-    like `["zika", "all", "all"]`, then the fstem should just be "zika". If the
-    wildcards are for flu's H3N2 HA segment, then the fstem should be
-    "flu_h3n2_ha".
+    """Return the filename stem for the current virus.
     """
     return "--fstem %s" % "_".join([wildcard
-                                    for wildcard in [wildcards.virus, wildcards.lineage, wildcards.segment]
-                                    if wildcard != "all"])
+                                    for wildcard in [wildcards.virus, wildcards.lineage, wildcards.segment]])
 
 def _get_resolve_method(wildcards):
     """Return a resolve_method argument for fauna sequence downloads if one has been
