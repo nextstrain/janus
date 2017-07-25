@@ -30,12 +30,12 @@
             "viruses_per_month": 100,
             "resolve_method": "choose_genbank"
         },
-        "h7n9": {
+        "H7N9": {
             "viruses_per_month": 0,
             "lineages": [
-                "h7n9"
+                "all"
             ],
-            "h7n9": {
+            "all": {
                 "resolutions": [
                     "all"
                  ],
