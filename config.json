@@ -13,7 +13,8 @@
                     "6y": 24,
                     "12y": 12
                 },
-                "sampling": "even"
+                "sampling": "even",
+                "has_titers": true
             }
         },
         "zika": {
