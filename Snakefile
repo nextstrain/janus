@@ -1,3 +1,4 @@
+from collections import defaultdict
 import os
 import shlex
 import sys
@@ -20,15 +21,36 @@ def _get_json_outputs_by_virus(config):
     segments defined in the configuration.
     """
     outputs = []
-    for virus in config["viruses"]:
-        if "lineages" in config["viruses"][virus]:
-            virus_config = config["viruses"][virus]
-            for lineage in virus_config["lineages"]:
-                for resolution in virus_config[lineage]["resolutions"]:
-                    for segment in virus_config[lineage]["segments"]:
-                        outputs.append("augur/%s/auspice/%s_%s_%s_%s_meta.json" % (virus, virus, lineage, segment, resolution))
+    viruses = defaultdict(list)
+
+    if "builds" in config:
+        # If the build config is user-defined on the command line, it will be a
+        # comma-delimited string of viruses and lineages. If it is defined in
+        # the config file, it will be a list.
+        if isinstance(config["builds"], str):
+            builds = config["builds"].replace(" ", "").split(",")
         else:
-            outputs.append("augur/%s/auspice/%s_meta.json" % (virus, virus))
+            builds = config["builds"]
+
+        for build in builds:
+            # Specific lineages are requested in the format of
+            # "virus/lineage". In the absence of specific lineage requests, use
+            # all defined lineages in the configuration file or default to
+            # "all".
+            if "/" in build:
+                virus, lineage = build.split("/")
+                viruses[virus].append(lineage)
+            elif "lineages" in config["viruses"][build]:
+                viruses[build] = config["viruses"][build]["lineages"]
+            else:
+                viruses[build].append("all")
+
+    for virus, lineages in viruses.items():
+        virus_config = config["viruses"][virus]
+        for lineage in lineages:
+            for resolution in virus_config.get(lineage, {}).get("resolutions", ["all"]):
+                for segment in virus_config.get(lineage, {}).get("segments", ["all"]):
+                    outputs.append("augur/%s/auspice/%s_%s_%s_%s_meta.json" % (virus, virus, lineage, segment, resolution))
 
     return outputs
 

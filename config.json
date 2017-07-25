@@ -1,4 +1,8 @@
 {
+    "builds": [
+        "ebola",
+        "zika"
+    ],
     "viruses": {
         "flu": {
             "lineages": [
