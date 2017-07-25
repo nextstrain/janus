@@ -14,7 +14,8 @@
                     "12y": 12
                 },
                 "sampling": "even",
-                "has_titers": true
+                "has_titers": true,
+                "process_arguments": "--no_mut_freqs --no_tree_freqs"
             }
         },
         "zika": {

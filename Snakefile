@@ -1,4 +1,5 @@
 import os
+import shlex
 import sys
 
 shell.prefix("source activate augur; ")
@@ -103,6 +104,24 @@ def _get_fauna_lineage(wildcards):
     else:
         return wildcards.lineage
 
+def _get_process_arguments(wildcards):
+    """Return any custom arguments the user has defined in the configuration for the
+    process step.
+    """
+    process_arguments = config["viruses"][wildcards.virus].get(wildcards.lineage, {}).get("process_arguments")
+
+    if process_arguments is not None:
+        # Clean up arguments to prevent accidental or intentional injections. This
+        # works by identifying and removing any potentially dangerous punctuation
+        # characters (e.g., ";" or "|").
+        tokens = shlex.shlex(process_arguments, punctuation_chars=True, posix=True)
+        process_arguments = " ".join([token for token in tokens
+                                      if token not in tokens.punctuation_chars])
+
+        return process_arguments
+    else:
+        return ""
+
 rule all:
     input: _get_json_outputs_by_virus(config)
 
@@ -113,8 +132,9 @@ rule all:
 rule process_virus_lineage:
     input: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
     output: "augur/{virus}/auspice/{virus}_{lineage}_{segment}_{resolution}_meta.json"
+    params: process_arguments=_get_process_arguments
     benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
-    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} --no_mut_freqs --no_tree_freqs"
+    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} {params.process_arguments}"
 
 def _get_prepare_inputs_by_virus_lineage(wildcards):
     """Determine which inputs should be built for the given virus/lineage especially
