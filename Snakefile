@@ -191,8 +191,34 @@ def _get_titers_argument_by_virus_lineage(wildcards, input):
     else:
         return ""
 
+#
+# Prepare outputs for local and remote storage.
+#
+
+LOCAL_OUTPUTS = _get_json_outputs_by_virus(config)
+FILENAMES = [output.split("/")[-1].replace("_all", "") for output in LOCAL_OUTPUTS]
+REMOTE_OUTPUTS = expand("remote/{filename}", filename=FILENAMES)
+S3_BUCKET = config["s3_bucket"]
+
 rule all:
-    input: _get_json_outputs_by_virus(config)
+    input: LOCAL_OUTPUTS
+
+#
+# Prepare outputs to sync to an S3 bucket.
+#
+
+rule sync:
+    input: REMOTE_OUTPUTS
+    shell: """aws --profile nextstrain s3 sync `dirname {input[0]}` s3://{S3_BUCKET}/ --include "*.json" """
+
+rule prepare_builds_for_remote:
+    input: LOCAL_OUTPUTS
+    output: REMOTE_OUTPUTS
+    run:
+      for i in range(len(input)):
+          local = input[i]
+          remote = output[i]
+          shell("cp {local} {remote}")
 
 #
 # Prepare and process viruses by lineage.
