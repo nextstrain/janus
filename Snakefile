@@ -276,7 +276,7 @@ rule prepare_virus_lineage:
     benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py {params.lineage} \
               {params.resolution} {params.segment} {params.sampling} \
-              --viruses_per_month_seq {params.viruses_per_month} {params.titers} \
+              -v {params.viruses_per_month} {params.titers} \
               --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
 
 #
