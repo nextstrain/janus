@@ -1,5 +1,9 @@
 {
     "s3_bucket": "nextstrain-dev-data",
+    "cloudfront_ids": {
+        "dev": "E1XKGZG0ZTX4YN",
+        "pro": "E1ZD3XPSGXABBI"
+    },
     "builds": [
         "ebola",
         "zika"
