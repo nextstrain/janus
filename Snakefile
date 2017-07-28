@@ -1,4 +1,5 @@
 from collections import defaultdict
+from snakemake.logging import logger
 import os
 import shlex
 import sys
@@ -204,12 +205,43 @@ rule all:
     input: LOCAL_OUTPUTS
 
 #
-# Prepare outputs to sync to an S3 bucket.
+# Prepare outputs to push to an S3 bucket.
 #
 
-rule sync:
+def _get_cloudfront_id(wildcards):
+    """Return the CloudFront id corresponding to a name defined in the user
+    configuration. If no id can be found, return None.
+    """
+    cloudfront_id = None
+
+    # User has requested a CloudFront invalidation by name.
+    if "cloudfront" in config:
+        if "cloudfront_ids" in config:
+            if config["cloudfront"] in config["cloudfront_ids"]:
+                cloudfront_id = config["cloudfront_ids"][config["cloudfront"]]
+            else:
+                logger.error("The requested CloudFront name, '%s', does not have a corresponding id in the configuration." % config["cloudfront"])
+        else:
+            logger.error("No CloudFront name/id mappings are defined in the configuration.")
+
+    return cloudfront_id
+
+rule push:
     input: REMOTE_OUTPUTS
-    shell: """aws --profile nextstrain s3 sync `dirname {input[0]}` s3://{S3_BUCKET}/ --include "*.json" """
+    params: cloudfront=_get_cloudfront_id
+    run:
+        # Push local outputs to an S3 bucket.
+        shell("""aws --profile nextstrain s3 sync --dryrun `dirname {input[0]}` s3://{S3_BUCKET}/ --include "*.json" """)
+
+        # If a CloudFront name is given by the user and it matches a name in the
+        # configuration, the corresponding CloudFront distribution id will be
+        # used to create an invalidation request.
+        if params.cloudfront is not None:
+            # Always enable the CloudFront preview interface.
+            shell("aws configure set preview.cloudfront true")
+
+            # Create the invalidation request.
+            shell("aws --profile nextstrain s3 cloudfront create-invalidation --distribution-id {params.cloudfront}")
 
 rule prepare_builds_for_remote:
     input: LOCAL_OUTPUTS
