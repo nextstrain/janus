@@ -1,4 +1,5 @@
 {
+    "s3_bucket": "nextstrain-dev-data",
     "builds": [
         "ebola",
         "zika"
