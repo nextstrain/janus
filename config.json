@@ -36,7 +36,9 @@
             "resolve_method": "choose_genbank"
         },
         "dengue": {
-            "lineages": ["denv1"],
+            "lineages": [
+                "denv1"
+            ],
             "denv1": {
                 "process_arguments": "--no_mut_freqs --no_tree_freqs --no_raxml"
             },
