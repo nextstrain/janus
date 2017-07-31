@@ -42,24 +42,14 @@
             },
             "viruses_per_month": 0
         },
-        "H7N9": {
+        "avian": {
             "viruses_per_month": 0,
             "lineages": [
-                "all"
+                "h7n9"
             ],
-            "all": {
-                "resolutions": [
-                    "all"
-                 ],
+            "h7n9": {
                 "segments": [
-                    "pb2",
-                    "pb1",
-                    "pa",
-                    "ha",
-                    "np",
-                    "na",
-                    "mp",
-                    "ns"
+                    "ha"
                 ]
             }
         }
