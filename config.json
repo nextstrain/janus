@@ -35,6 +35,13 @@
             "viruses_per_month": 100,
             "resolve_method": "choose_genbank"
         },
+        "dengue": {
+            "lineages": ["denv1"],
+            "denv1": {
+                "process_arguments": "--no_mut_freqs --no_tree_freqs --no_raxml"
+            },
+            "viruses_per_month": 0
+        },
         "H7N9": {
             "viruses_per_month": 0,
             "lineages": [
