@@ -269,6 +269,12 @@ rule process_virus_lineage:
     benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} {params.process_arguments}"
 
+def _get_file_prefix(wildcards, output):
+    """Return a file prefix for the given virus/lineage.
+    """
+    output_dir, output_file = os.path.split(output[0])
+    return output_file.replace(".json", "")
+
 rule prepare_virus_lineage:
     input: unpack(_get_prepare_inputs_by_virus_lineage)
     output: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
@@ -278,12 +284,14 @@ rule prepare_virus_lineage:
         resolution=_get_resolution_argument_by_virus_lineage,
         segment=_get_segment_argument_by_virus_lineage,
         sampling=_get_sampling_argument_by_virus_lineage,
-        titers=_get_titers_argument_by_virus_lineage
+        titers=_get_titers_argument_by_virus_lineage,
+        prefix=_get_file_prefix
     benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py {params.lineage} \
               {params.resolution} {params.segment} {params.sampling} \
               -v {params.viruses_per_month} {params.titers} \
-              --sequences {SNAKEMAKE_DIR}/{input.sequences}"""
+              --sequences {SNAKEMAKE_DIR}/{input.sequences} \
+              --file_prefix {params.prefix}"""
 
 #
 # Download data with fauna
