@@ -236,6 +236,13 @@ rule push:
     input: REMOTE_OUTPUTS
     params: cloudfront=_get_cloudfront_id
     run:
+        # Prevent pushing directly to production buckets.
+        production_buckets = ["nextstrain-data"]
+
+        if S3_BUCKET in production_buckets:
+            logger.error("Cannot push directly to a production S3 bucket.")
+            return
+
         # Push local outputs to an S3 bucket.
         shell("""aws --profile nextstrain s3 sync --dryrun `dirname {input[0]}` s3://{S3_BUCKET}/ --include "*.json" """)
 
