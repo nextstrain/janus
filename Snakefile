@@ -293,9 +293,10 @@ rule prepare_builds_for_remote:
 rule process_virus_lineage:
     input: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
     output: "augur/{virus}/auspice/{virus}_{lineage}_{segment}_{resolution}_meta.json"
+    log: "log/process_{virus}_{lineage}_{segment}_{resolution}.log"
     params: process_arguments=_get_process_arguments
     benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
-    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} {params.process_arguments}"
+    shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} {params.process_arguments} &> {SNAKEMAKE_DIR}/{log}"
 
 def _get_file_prefix(wildcards, output):
     """Return a file prefix for the given virus/lineage.
@@ -306,6 +307,7 @@ def _get_file_prefix(wildcards, output):
 rule prepare_virus_lineage:
     input: unpack(_get_prepare_inputs_by_virus_lineage)
     output: "augur/{virus}/prepared/{virus}_{lineage}_{segment}_{resolution}.json"
+    log: "log/prepare_{virus}_{lineage}_{segment}_{resolution}.log"
     params:
         lineage=_get_lineage_argument_by_virus_lineage,
         viruses_per_month=_get_viruses_per_month,
@@ -319,7 +321,7 @@ rule prepare_virus_lineage:
               {params.resolution} {params.segment} {params.sampling} \
               -v {params.viruses_per_month} {params.titers} \
               --sequences {SNAKEMAKE_DIR}/{input.sequences} \
-              --file_prefix {params.prefix}"""
+              --file_prefix {params.prefix} &> {SNAKEMAKE_DIR}/{log}"""
 
 #
 # Download data with fauna
@@ -327,11 +329,13 @@ rule prepare_virus_lineage:
 
 rule download_virus_lineage_titers:
     output: "fauna/data/{virus}_{lineage}_titers.tsv"
+    log: "log/fauna_titers_{virus}_{lineage}.log"
     benchmark: "benchmarks/fauna_{virus}_{lineage}_titers.txt"
-    shell: "cd fauna && python tdb/download.py -db tdb -v {wildcards.virus} --subtype {wildcards.lineage} --select assay_type:hi --fstem {wildcards.virus}_{wildcards.lineage}"
+    shell: "cd fauna && python tdb/download.py -db tdb -v {wildcards.virus} --subtype {wildcards.lineage} --select assay_type:hi --fstem {wildcards.virus}_{wildcards.lineage} &> {SNAKEMAKE_DIR}/{log}"
 
 rule download_virus_lineage_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
+    log: "log/fauna_sequences_{virus}_{lineage}_{segment}.log"
     params:
         virus=_get_fauna_virus,
         locus=_get_locus_argument,
@@ -339,7 +343,7 @@ rule download_virus_lineage_sequences:
         fstem=_get_fstem_argument,
         resolve_method=_get_resolve_method
     benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
-    shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.locus} {params.fauna_lineage} {params.fstem} {params.resolve_method}"
+    shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.locus} {params.fauna_lineage} {params.fstem} {params.resolve_method} &> {SNAKEMAKE_DIR}/{log}"
 
 #
 # Clean up output files for quick rebuild without redownload
