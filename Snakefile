@@ -264,8 +264,16 @@ rule push:
             logger.error("Cannot push directly to a production S3 bucket.")
             return
 
-        # Push local outputs to an S3 bucket.
-        shell("""aws --profile nextstrain s3 sync --dryrun `dirname {input[0]}` s3://{S3_BUCKET}/ --include "*.json" """)
+        # Build a list of include expressions for each remote output. For an
+        # output like "zika_meta.json", the include will look like `--include
+        # zika_*.json`.
+        includes = []
+        for json in input:
+            includes.append("--include \"%s\"" % os.path.split(json)[-1].replace("_meta.json", "_*.json"))
+
+        # Push local outputs to an S3 bucket. Exclude all files by default and
+        # sync only those matching the includes list.
+        shell("""aws --profile nextstrain s3 sync --dryrun `dirname {input[0]}` s3://{S3_BUCKET}/ --exclude "*" %s""" % " ".join(includes))
 
         # If a CloudFront name is given by the user and it matches a name in the
         # configuration, the corresponding CloudFront distribution id will be
