@@ -318,7 +318,7 @@ rule download_virus_lineage_sequences:
         fstem=_get_fstem_argument,
         resolve_method=_get_resolve_method
     benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
-    shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.locus} {params.fstem} {params.resolve_method}"
+    shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.locus} {params.fauna_lineage} {params.fstem} {params.resolve_method}"
 
 #
 # Clean up output files for quick rebuild without redownload
