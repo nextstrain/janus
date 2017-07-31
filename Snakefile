@@ -17,11 +17,7 @@ SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 # Helper functions
 #
 
-def _get_json_outputs_by_virus(config):
-    """Prepare a list of outputs for all combination of viruses, lineages, and
-    segments defined in the configuration.
-    """
-    outputs = []
+def _get_virus_builds(config):
     viruses = defaultdict(list)
 
     if "builds" in config:
@@ -45,6 +41,16 @@ def _get_json_outputs_by_virus(config):
                 viruses[build] = config["viruses"][build]["lineages"]
             else:
                 viruses[build].append("all")
+
+    return viruses
+
+
+def _get_json_outputs_by_virus(config):
+    """Prepare a list of outputs for all combination of viruses, lineages, and
+    segments defined in the configuration.
+    """
+    outputs = []
+    viruses = _get_virus_builds(config)
 
     for virus, lineages in viruses.items():
         virus_config = config["viruses"][virus]
@@ -304,7 +310,7 @@ rule download_virus_lineage_sequences:
 #
 
 rule clean:
-    params: viruses=list(config["viruses"].keys())
+    params: viruses=list(_get_virus_builds(config).keys())
     shell: """for virus in {params.viruses}
 do
     rm -f augur/$virus/prepared/$virus*;
