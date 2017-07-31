@@ -133,6 +133,7 @@ def _get_fauna_lineage_argument(wildcards):
     prepend the 'seasonal_' prefix to seasonal flu strains for fauna when
     necessary.
     """
+    # TODO: handle virus-specific logic inside fauna itself.
     if wildcards.virus == "flu" and wildcards.lineage in ["h3n2", "h1n1pdm", "vic", "yam"]:
         fauna_lineage = "seasonal_%s" % wildcards.lineage
     elif wildcards.lineage != "all":
@@ -140,8 +141,15 @@ def _get_fauna_lineage_argument(wildcards):
     else:
         fauna_lineage = None
 
+    if wildcards.virus == "dengue":
+        # fauna download scripts for dengue expect a filter like "--select serotype:1".
+        lineage_attribute = "serotype"
+        fauna_lineage = fauna_lineage.replace("denv", "")
+    else:
+        lineage_attribute = "lineage"
+
     if fauna_lineage is not None:
-        return "--select lineage:%s" % fauna_lineage
+        return "--select %s:%s" % (lineage_attribute, fauna_lineage)
     else:
         return ""
 
