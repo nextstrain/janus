@@ -119,6 +119,17 @@ def _get_segment_argument_by_virus_lineage(wildcards):
     else:
         return ""
 
+def _get_fauna_virus(wildcards):
+    """Returns the name fauna uses for a given virus.
+    """
+    # TODO: update fauna to encapsulate inconsistent virus naming conventions.
+    if wildcards.virus == "avian":
+        virus = "h7n9"
+    else:
+        virus = wildcards.virus
+
+    return virus.lower()
+
 def _get_locus_argument(wildcards):
     """If the current virus/lineage has a defined segment, uppercase the requested
     segment name for fauna.
@@ -136,6 +147,8 @@ def _get_fauna_lineage_argument(wildcards):
     # TODO: handle virus-specific logic inside fauna itself.
     if wildcards.virus == "flu" and wildcards.lineage in ["h3n2", "h1n1pdm", "vic", "yam"]:
         fauna_lineage = "seasonal_%s" % wildcards.lineage
+    elif wildcards.virus == "avian":
+        fauna_lineage = None
     elif wildcards.lineage != "all":
         fauna_lineage = wildcards.lineage
     else:
@@ -320,7 +333,7 @@ rule download_virus_lineage_titers:
 rule download_virus_lineage_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
     params:
-        virus=lambda wildcards: wildcards.virus.lower(),
+        virus=_get_fauna_virus,
         locus=_get_locus_argument,
         fauna_lineage=_get_fauna_lineage_argument,
         fstem=_get_fstem_argument,
