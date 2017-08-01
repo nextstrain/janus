@@ -394,4 +394,5 @@ do
     rm -f augur/$virus/prepared/$virus*;
     rm -f augur/$virus/processed/$virus*;
     rm -f augur/$virus/auspice/$virus*;
+    rm -f remote/$virus*;
 done"""
