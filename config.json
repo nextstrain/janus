@@ -5,6 +5,9 @@
         "pro": "E1ZD3XPSGXABBI"
     },
     "builds": [
+        "avian",
+        "flu",
+        "dengue",
         "ebola",
         "zika"
     ],
@@ -14,7 +17,7 @@
                 "h3n2"
             ],
             "h3n2": {
-                "resolutions": ["3y", "6y"],
+                "resolutions": ["2y", "3y", "6y", "12y"],
                 "segments": ["ha"],
                 "viruses_per_month": {
                     "2y": 90,
@@ -24,16 +27,22 @@
                 },
                 "sampling": "even",
                 "has_titers": true,
-                "process_arguments": "--no_mut_freqs --no_tree_freqs"
+                "process_arguments": "--no_mut_freqs --no_tree_freqs --no_raxml"
             }
         },
         "zika": {
             "viruses_per_month": 15,
-            "resolve_method": "choose_genbank"
+            "resolve_method": "choose_genbank",
+            "all": {
+                "process_arguments": "--no_raxml"
+            }
         },
         "ebola": {
             "viruses_per_month": 100,
-            "resolve_method": "choose_genbank"
+            "resolve_method": "choose_genbank",
+            "all": {
+                "process_arguments": "--no_raxml"
+            }
         },
         "dengue": {
             "lineages": [
@@ -42,7 +51,7 @@
             "denv1": {
                 "process_arguments": "--no_mut_freqs --no_tree_freqs --no_raxml"
             },
-            "viruses_per_month": 0
+            "viruses_per_month": 3
         },
         "avian": {
             "viruses_per_month": 0,
@@ -52,7 +61,8 @@
             "h7n9": {
                 "segments": [
                     "ha"
-                ]
+                ],
+                "process_arguments": "--no_raxml"
             }
         }
     }
