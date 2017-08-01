@@ -55,6 +55,14 @@ Build Zika
 
 ### Installation
 
+Check out the code and branch.
+
+```bash
+git clone --recursive https://github.com/nextstrain/janus.git
+cd janus
+git checkout rhino-deploy
+```
+
 Download and install miniconda.
 
 ```bash
@@ -79,10 +87,15 @@ ln -s ${CONDA_BIN_DIR}/FastTree ${CONDA_BIN_DIR}/fasttree
 
 ### Usage
 
-Export rethinkdb environment variables and load Anaconda environment.
+Export rethinkdb environment variables and load Anaconda environment. The
+`environment_rethink.sh` script exists outside of version control and defines
+variables for connecting to the RethinkDB.
 
 ```bash
+# Setup the RethinkDB environment.
 . environment_rethink.sh
+
+# Setup the Python environment.
 source activate janus_python3
 ```
 
@@ -112,16 +125,15 @@ and not synced to S3. Use the `push` rule to build one or more specific viruses
 and push them to S3. Note that the AWS CLI expects credentials to be defined in
 `~/.aws/credentials` under the profile `nextstrain`.
 
-The following command builds seasonal flu, Zika, and Ebola files, pushes the
-corresponding auspice output to the development data bucket on S3, and creates
-an invalidation request for the corresponding development CloudFront
-account. The `cloudfront` argument can be omitted to only push files to S3 for
-testing.
+The following command builds seasonal flu, Zika, and Ebola files and pushes the
+corresponding auspice output to the development data bucket on S3. A
+`cloudfront` argument can be added to create an invalidation request for the
+corresponding development CloudFront account (e.g., `cloudfront=dev`).
 
 ```bash
 # Build all flu, zika, and ebola sites and push their JSONs to the development
 # S3 bucket.
-snakemake push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data cloudfront=dev
+snakemake push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data
 ```
 
 Use the `clean` rule to delete prepared, processed, and auspice files from one
