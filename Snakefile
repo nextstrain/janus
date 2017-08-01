@@ -2,6 +2,7 @@ from collections import defaultdict
 import glob
 import os
 import shlex
+import snakemake.utils
 from snakemake.logging import logger
 import sys
 
@@ -13,6 +14,9 @@ wildcard_constraints:
 
 # Set snakemake directory
 SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
+
+# Create the cluster log directory.
+snakemake.utils.makedirs("log/cluster")
 
 #
 # Helper functions

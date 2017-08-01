@@ -5,8 +5,8 @@
         "memory": "512",
         "disk": "6000",
         "name": "{rule}.{wildcards}",
-        "stdout": "log/{rule}.{wildcards}.%j.out",
-        "stderr": "log/{rule}.{wildcards}.%j.err"
+        "stdout": "log/cluster/{rule}.{wildcards}.%j.out",
+        "stderr": "log/cluster/{rule}.{wildcards}.%j.err"
     },
     "prepare_virus": {
         "time": "1"
