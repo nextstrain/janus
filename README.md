@@ -108,18 +108,27 @@ snakemake -w 30 -j 4 --cluster-config cluster.json --drmaa " --nodes=1 --ntasks=
 ```
 
 By default, all augur builds defined in `config["builds"]` will be built locally
-and not synced to S3. Use the `sync` rule to build one or more specific viruses
+and not synced to S3. Use the `push` rule to build one or more specific viruses
 and push them to S3. Note that the AWS CLI expects credentials to be defined in
 `~/.aws/credentials` under the profile `nextstrain`.
+
+The following command builds seasonal flu, Zika, and Ebola files, pushes the
+corresponding auspice output to the development data bucket on S3, and creates
+an invalidation request for the corresponding development CloudFront
+account. The `cloudfront` argument can be omitted to only push files to S3 for
+testing.
 
 ```bash
 # Build all flu, zika, and ebola sites and push their JSONs to the development
 # S3 bucket.
-snakemake push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data
+snakemake push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data cloudfront=dev
+```
 
-# After confirming everything looks good on the dev site, push to the production
-# S3 bucket.
-snakemake push --config builds="flu,zika,ebola" s3_bucket=nextstrain-data
+Use the `clean` rule to delete prepared, processed, and auspice files from one
+or more builds.
+
+```bash
+snakemake clean --config builds="flu,zika,ebola"
 ```
 
 ## License and copyright
