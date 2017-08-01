@@ -289,10 +289,10 @@ rule prepare_builds_for_remote:
     input: LOCAL_OUTPUTS
     output: REMOTE_OUTPUTS
     run:
-      for i in range(len(input)):
-          local = input[i]
-          remote = output[i]
-          shell("cp {local} {remote}")
+        for i in range(len(input)):
+            local = input[i]
+            remote = output[i]
+            shell("cp {local} {remote}")
 
 #
 # Prepare and process viruses by lineage.
