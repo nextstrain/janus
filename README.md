@@ -99,7 +99,7 @@ export NCBI_EMAIL=
 
 ### Usage
 
-Edit `config.json` to Configure which viruses, lineages, and resolutions to
+Edit `config.json` to configure which viruses, lineages, and resolutions to
 build.
 
 ```bash
