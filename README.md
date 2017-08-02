@@ -61,6 +61,7 @@ Check out the code and branch.
 git clone --recursive https://github.com/nextstrain/janus.git
 cd janus
 git checkout rhino-deploy
+git submodule update --init --recursive
 ```
 
 Download and install miniconda.
