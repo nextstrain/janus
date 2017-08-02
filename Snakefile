@@ -286,7 +286,7 @@ rule push:
 
         # Push local outputs to an S3 bucket. Exclude all files by default and
         # sync only those matching the includes list.
-        shell("""aws --profile nextstrain s3 sync --dryrun `dirname {input[0]}` s3://{S3_BUCKET}/ --exclude "*" %s""" % " ".join(includes))
+        shell("""aws --profile nextstrain s3 sync `dirname {input[0]}` s3://{S3_BUCKET}/ --exclude "*" %s""" % " ".join(includes))
 
         # If a CloudFront name is given by the user and it matches a name in the
         # configuration, the corresponding CloudFront distribution id will be
