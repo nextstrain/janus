@@ -74,7 +74,7 @@ bash Miniconda3-latest-Linux-x86_64.sh
 Setup the Anaconda environments.
 
 ```bash
-conda env create -f anaconda.augur.yaml
+conda env create -f anaconda.python2.yaml
 conda env create -f anaconda.python3.yaml
 ```
 
