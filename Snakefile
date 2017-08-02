@@ -30,6 +30,17 @@ SNAKEMAKE_DIR = os.path.dirname(workflow.snakefile)
 # Create the cluster log directory.
 snakemake.utils.makedirs("log/cluster")
 
+# Warn user about missing environment variables and exit if any are missing.
+EXPECTED_ENV_VARIABLES = ["RETHINK_HOST", "RETHINK_AUTH_KEY", "NCBI_EMAIL"]
+MISSING_ENV_VARIABLES = []
+for variable in EXPECTED_ENV_VARIABLES:
+    if not variable in os.environ:
+        MISSING_ENV_VARIABLES.append(variable)
+
+if len(MISSING_ENV_VARIABLES) > 0:
+    logger.warning("Missing environment variables: %s" % ", ".join(MISSING_ENV_VARIABLES))
+    sys.exit(1)
+
 #
 # Helper functions
 #
