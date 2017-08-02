@@ -1,4 +1,4 @@
-name: augur
+name: janus_python2
 channels:
 - !!python/unicode
   'bioconda'
