@@ -19,7 +19,6 @@ onerror:
         message = {"text": "One or more of the following augur builds failed: %s." % ", ".join(builds)}
         shell("""curl -X POST -H 'Content-type: application/json' --data '{%s}' $SLACK_WEBHOOK_URL""" % json.dumps(message))
 
-shell.prefix("source activate augur; ")
 configfile: "config.json"
 localrules: download_virus_lineage_titers, download_virus_lineage_sequences, download_complete_virus_sequences
 wildcard_constraints:
@@ -347,6 +346,7 @@ rule process_virus_lineage:
     log: "log/process_{virus}_{lineage}_{segment}_{resolution}.log"
     params: process_arguments=_get_process_arguments
     benchmark: "benchmarks/process/{virus}_{lineage}_{segment}_{resolution}.txt"
+    conda: "envs/anaconda.python2.yaml"
     shell: "cd augur/{wildcards.virus} && python {wildcards.virus}.process.py -j {SNAKEMAKE_DIR}/{input} {params.process_arguments} &> {SNAKEMAKE_DIR}/{log}"
 
 def _get_file_prefix(wildcards, output):
@@ -368,6 +368,7 @@ rule prepare_virus_lineage:
         titers=_get_titers_argument_by_virus_lineage,
         prefix=_get_file_prefix
     benchmark: "benchmarks/prepare/{virus}_{lineage}_{segment}_{resolution}.txt"
+    conda: "envs/anaconda.python2.yaml"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py {params.lineage} \
               {params.resolution} {params.segment} {params.sampling} \
               -v {params.viruses_per_month} {params.titers} \
@@ -382,6 +383,7 @@ rule download_virus_lineage_titers:
     output: "fauna/data/{virus}_{lineage}_titers.tsv"
     log: "log/fauna_titers_{virus}_{lineage}.log"
     benchmark: "benchmarks/fauna_{virus}_{lineage}_titers.txt"
+    conda: "envs/anaconda.python2.yaml"
     shell: "cd fauna && python tdb/download.py -db tdb -v {wildcards.virus} --subtype {wildcards.lineage} --select assay_type:hi --fstem {wildcards.virus}_{wildcards.lineage} &> {SNAKEMAKE_DIR}/{log}"
 
 rule download_virus_lineage_sequences:
@@ -394,6 +396,7 @@ rule download_virus_lineage_sequences:
         fstem=_get_fstem_argument,
         resolve_method=_get_resolve_method
     benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
+    conda: "envs/anaconda.python2.yaml"
     shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.locus} {params.fauna_lineage} {params.fstem} {params.resolve_method} &> {SNAKEMAKE_DIR}/{log}"
 
 #
