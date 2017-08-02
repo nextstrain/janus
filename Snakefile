@@ -322,7 +322,7 @@ rule prepare_builds_for_remote:
             for local_file in local_files:
                 renamed_local_file = _rename_local_file_as_remote(local_file)
                 remote_file = os.path.join(remote_dir, renamed_local_file)
-                shell("rsync -v {local_file} {remote_file}")
+                shell("rsync -z {local_file} {remote_file}")
 
 #
 # Prepare and process viruses by lineage.
