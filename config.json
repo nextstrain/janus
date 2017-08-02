@@ -26,31 +26,28 @@
                     "12y": 12
                 },
                 "sampling": "even",
-                "has_titers": true,
-                "process_arguments": "--no_mut_freqs --no_tree_freqs --no_raxml"
+                "has_titers": true
             }
         },
         "zika": {
             "viruses_per_month": 15,
             "resolve_method": "choose_genbank",
             "all": {
-                "process_arguments": "--no_raxml"
             }
         },
         "ebola": {
             "viruses_per_month": 100,
             "resolve_method": "choose_genbank",
             "all": {
-                "process_arguments": "--no_raxml"
             }
         },
         "dengue": {
             "lineages": [
-                "denv1"
+                "denv1",
+                "denv2",
+                "denv3",
+                "denv4"
             ],
-            "denv1": {
-                "process_arguments": "--no_mut_freqs --no_tree_freqs --no_raxml"
-            },
             "viruses_per_month": 3
         },
         "avian": {
@@ -62,7 +59,6 @@
                 "segments": [
                     "ha"
                 ],
-                "process_arguments": "--no_raxml"
             }
         }
     }
