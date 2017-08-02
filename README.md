@@ -64,66 +64,70 @@ git checkout rhino-deploy
 git submodule update --init --recursive
 ```
 
-Download and install miniconda.
+Install Python environment.
 
 ```bash
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b
+./install.sh
 ```
 
-Setup the Anaconda environment.
+### Configuration
+
+Setup AWS credentials before the first Janus run.
 
 ```bash
-conda env create -f envs/anaconda.python3.yaml
+mkdir ~/.aws
+chmod 700 ~/.aws
+touch ~/.aws/credentials
+chmod 600 ~/.aws/credentials
 ```
 
-Create symlinks for binaries with non-standard names.
+Add a `nextstrain` profile to the credentials file.
+
+```ini
+[nextstrain]
+aws_access_key_id =
+aws_secret_access_key =
+```
+
+Set database variables in the environment before each Janus run.
 
 ```bash
-export CONDA_BIN_DIR=$(dirname `which conda`)
-ln -s ${CONDA_BIN_DIR}/raxmlHPC ${CONDA_BIN_DIR}/raxml
-ln -s ${CONDA_BIN_DIR}/FastTree ${CONDA_BIN_DIR}/fasttree
+export RETHINK_HOST=
+export RETHINK_AUTH_KEY=
+export NCBI_EMAIL=
 ```
 
 ### Usage
 
-Export rethinkdb environment variables and load Anaconda environment. The
-`environment_rethink.sh` script exists outside of version control and defines
-variables for connecting to the RethinkDB.
+Edit `config.json` to Configure which viruses, lineages, and resolutions to
+build.
 
 ```bash
-# Setup the RethinkDB environment.
-. environment_rethink.sh
-
-# Setup the Python environment.
-source activate janus_python3
+vim config.json
 ```
 
-Configure which viruses, lineages, and resolutions to build in
-`config.json`. Perform a dry-run of the builds by printing the commands that
-will be executed for the configuration.
+Perform a dry-run of the builds by printing the rules that will be executed for
+the configuration.
 
 ```bash
-snakemake -npq
+./janus --dryrun
 ```
 
 If everything looks good, run builds on the cluster. For example, the following
-command runs no more than 4 builds at a time.
+command runs no more than 4 builds at a time. All arguments to `janus` are
+passed through to `snakemake`.
 
 ```bash
-snakemake -w 30 -j 4 --cluster-config cluster.json --cluster "sbatch --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time} --job-name='{cluster.name}' --output='{cluster.stdout}' --error='{cluster.stderr}'"
-```
-
-Alternately, jobs can be submitted using the DRMAA interface as follows.
-
-```bash
-snakemake -w 30 -j 4 --cluster-config cluster.json --drmaa " --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time}" --jobname "{rulename}.{jobid}.sh"
+./janus -j 4
 ```
 
 By default, all augur builds defined in `config["builds"]` will be built locally
 and not synced to S3. Use the `push` rule to build one or more specific viruses
-and push them to S3. Note that the AWS CLI expects credentials to be defined in
-`~/.aws/credentials` under the profile `nextstrain`.
+and push them to S3.
+
+```bash
+./janus -j 4 push
+```
 
 The following command builds seasonal flu, Zika, and Ebola files and pushes the
 corresponding auspice output to the development data bucket on S3. A
@@ -131,16 +135,14 @@ corresponding auspice output to the development data bucket on S3. A
 corresponding development CloudFront account (e.g., `cloudfront=dev`).
 
 ```bash
-# Build all flu, zika, and ebola sites and push their JSONs to the development
-# S3 bucket.
-snakemake push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data
+./janus -j 4 push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data
 ```
 
 Use the `clean` rule to delete prepared, processed, and auspice files from one
 or more builds.
 
 ```bash
-snakemake clean --config builds="flu,zika,ebola"
+./janus -j 1 clean --config builds="flu,zika,ebola"
 ```
 
 ## License and copyright
