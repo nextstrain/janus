@@ -68,14 +68,13 @@ Download and install miniconda.
 
 ```bash
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh -b
 ```
 
-Setup the Anaconda environments.
+Setup the Anaconda environment.
 
 ```bash
-conda env create -f anaconda.python2.yaml
-conda env create -f anaconda.python3.yaml
+conda env create -f envs/anaconda.python3.yaml
 ```
 
 Create symlinks for binaries with non-standard names.
