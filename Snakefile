@@ -1,10 +1,23 @@
 from collections import defaultdict
 import glob
+import json
 import os
 import shlex
 import snakemake.utils
 from snakemake.logging import logger
 import sys
+
+onsuccess:
+    if "SLACK_WEBHOOK_URL" in os.environ:
+        builds = list(_get_virus_builds(config).keys())
+        message = {"text": "Augur builds for %s completed successfully." % ", ".join(builds)}
+        shell("""curl -X POST -H 'Content-type: application/json' --data '{%s}' $SLACK_WEBHOOK_URL""" % json.dumps(message))
+
+onerror:
+    if "SLACK_WEBHOOK_URL" in os.environ:
+        builds = list(_get_virus_builds(config).keys())
+        message = {"text": "One or more of the following augur builds failed: %s." % ", ".join(builds)}
+        shell("""curl -X POST -H 'Content-type: application/json' --data '{%s}' $SLACK_WEBHOOK_URL""" % json.dumps(message))
 
 shell.prefix("source activate augur; ")
 configfile: "config.json"
