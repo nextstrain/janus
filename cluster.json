@@ -9,10 +9,10 @@
         "stderr": "log/cluster/{rule}.{wildcards}.%j.err"
     },
     "prepare_virus_lineage": {
-        "time": "1"
+        "time": "00:01:00"
     },
     "process_virus_lineage": {
-        "time": "2:00:00",
+        "time": "02:00:00",
         "memory": "4096"
     }
 }
