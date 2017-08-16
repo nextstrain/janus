@@ -395,11 +395,36 @@ rule prepare_virus_lineage:
 # Download data with fauna
 #
 
+def _get_fauna_titer_subtype(wildcards):
+    """Returns a TDB download argument for the `--subtype` option based on the
+    requested virus.
+    """
+    if wildcards.virus == "dengue":
+        argument = ""
+    else:
+        argument = "--subtype %s" % wildcards.lineage
+
+    return argument
+
+def _get_fauna_titer_assay_type(wildcards):
+    """Returns a TDB download argument for the `--select assay_type:<type>` option
+    based on the requested virus.
+    """
+    if wildcards.virus == "dengue":
+        argument = ""
+    else:
+        argument = "--select assay_type:hi"
+
+    return argument
+
 rule download_virus_lineage_titers:
     output: "fauna/data/{virus}_{lineage}_titers.tsv"
     log: "log/fauna_titers_{virus}_{lineage}.log"
     benchmark: "benchmarks/fauna_{virus}_{lineage}_titers.txt"
-    shell: "cd fauna && python tdb/download.py -db tdb -v {wildcards.virus} --subtype {wildcards.lineage} --select assay_type:hi --fstem {wildcards.virus}_{wildcards.lineage} &> {SNAKEMAKE_DIR}/{log}"
+    params:
+        subtype=_get_fauna_titer_subtype,
+        assay_type=_get_fauna_titer_assay_type
+    shell: "cd fauna && python tdb/download.py -db tdb -v {wildcards.virus} {params.subtype} {params.assay_type} --fstem {wildcards.virus}_{wildcards.lineage} &> {SNAKEMAKE_DIR}/{log}"
 
 rule download_virus_lineage_sequences:
     output: "fauna/data/{virus}_{lineage}_{segment}.fasta"
