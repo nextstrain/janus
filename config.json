@@ -48,7 +48,9 @@
                 "denv3",
                 "denv4"
             ],
-            "viruses_per_month": 3
+            "viruses_per_month": 3,
+            "has_titers": true,
+            "process_arguments": "--no_tree_freqs --no_mut_freqs --no_titers"
         },
         "avian": {
             "viruses_per_month": 0,
