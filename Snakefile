@@ -239,7 +239,8 @@ def _get_prepare_inputs_by_virus_lineage(wildcards):
     """
     inputs = {"sequences": "fauna/data/{wildcards.virus}_{wildcards.lineage}_{wildcards.segment}.fasta".format(wildcards=wildcards)}
 
-    if config["viruses"][wildcards.virus].get(wildcards.lineage, {}).get("has_titers", False):
+    # Titers can be enabled at the virus or lineage level.
+    if config["viruses"][wildcards.virus].get("has_titers", False) or config["viruses"][wildcards.virus].get(wildcards.lineage, {}).get("has_titers", False):
         inputs["titers"] = "fauna/data/{wildcards.virus}_{wildcards.lineage}_titers.tsv".format(wildcards=wildcards)
 
     return inputs
