@@ -214,7 +214,12 @@ def _get_process_arguments(wildcards):
     """Return any custom arguments the user has defined in the configuration for the
     process step.
     """
+    # First try to get lineage-specific arguments. Then try to get
+    # virus-specific arguments.
     process_arguments = config["viruses"][wildcards.virus].get(wildcards.lineage, {}).get("process_arguments")
+
+    if process_arguments is None:
+        process_arguments = config["viruses"][wildcards.virus].get("process_arguments")
 
     if process_arguments is not None:
         # Clean up arguments to prevent accidental or intentional injections. This
