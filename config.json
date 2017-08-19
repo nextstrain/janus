@@ -1,0 +1,74 @@
+{
+    "s3_bucket": "nextstrain-dev-data",
+    "cloudfront_ids": {
+        "dev": "E1XKGZG0ZTX4YN",
+        "pro": "E1ZD3XPSGXABBI"
+    },
+    "builds": [
+        "avian",
+        "flu",
+        "dengue",
+        "ebola",
+        "zika"
+    ],
+    "viruses": {
+        "flu": {
+            "lineages": [
+                "h3n2"
+            ],
+            "h3n2": {
+                "resolutions": ["2y", "3y", "6y", "12y"],
+                "segments": ["ha"],
+                "viruses_per_month": {
+                    "2y": 90,
+                    "3y": 60,
+                    "6y": 24,
+                    "12y": 12
+                },
+                "sampling": "even",
+                "has_titers": true
+            }
+        },
+        "zika": {
+            "viruses_per_month": 15,
+            "resolve_method": "choose_genbank",
+            "all": {
+            }
+        },
+        "ebola": {
+            "viruses_per_month": 100,
+            "resolve_method": "choose_genbank",
+            "all": {
+            }
+        },
+        "dengue": {
+            "lineages": [
+                "denv1",
+                "denv2",
+                "denv3",
+                "denv4"
+            ],
+            "viruses_per_month": 3,
+            "has_titers": true,
+            "process_arguments": "--no_tree_freqs --no_mut_freqs --no_titers"
+        },
+        "avian": {
+            "viruses_per_month": 0,
+            "lineages": [
+                "h7n9"
+            ],
+            "h7n9": {
+                "segments": [
+                    "pb2",
+                    "pb1",
+                    "pa",
+                    "ha",
+                    "np",
+                    "na",
+                    "mp",
+                    "ns"
+                ]
+            }
+        }
+    }
+}

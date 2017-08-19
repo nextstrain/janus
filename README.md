@@ -51,6 +51,100 @@ Build Zika
 
     python build.py
 
+## Building with Snakemake
+
+### Installation
+
+Check out the code and branch.
+
+```bash
+git clone --recursive https://github.com/nextstrain/janus.git
+cd janus
+git checkout rhino-deploy
+git submodule update --init --recursive
+```
+
+Install Python environment.
+
+```bash
+./install.sh
+```
+
+### Configuration
+
+Setup AWS credentials before the first Janus run.
+
+```bash
+mkdir ~/.aws
+chmod 700 ~/.aws
+touch ~/.aws/credentials
+chmod 600 ~/.aws/credentials
+```
+
+Add a `nextstrain` profile to the credentials file.
+
+```ini
+[nextstrain]
+aws_access_key_id =
+aws_secret_access_key =
+```
+
+Set database variables in the environment before each Janus run.
+
+```bash
+export RETHINK_HOST=
+export RETHINK_AUTH_KEY=
+export NCBI_EMAIL=
+```
+
+### Usage
+
+Edit `config.json` to configure which viruses, lineages, and resolutions to
+build.
+
+```bash
+vim config.json
+```
+
+Perform a dry-run of the builds by printing the rules that will be executed for
+the configuration.
+
+```bash
+./janus --dryrun
+```
+
+If everything looks good, run builds on the cluster. For example, the following
+command runs no more than 4 builds at a time. All arguments to `janus` are
+passed through to `snakemake`.
+
+```bash
+./janus -j 4
+```
+
+By default, all augur builds defined in `config["builds"]` will be built locally
+and not synced to S3. Use the `push` rule to build one or more specific viruses
+and push them to S3.
+
+```bash
+./janus -j 4 push
+```
+
+The following command builds seasonal flu, Zika, and Ebola files and pushes the
+corresponding auspice output to the development data bucket on S3. A
+`cloudfront` argument can be added to create an invalidation request for the
+corresponding development CloudFront account (e.g., `cloudfront=dev`).
+
+```bash
+./janus -j 4 push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data
+```
+
+Use the `clean` rule to delete prepared, processed, and auspice files from one
+or more builds.
+
+```bash
+./janus -j 1 clean --config builds="flu,zika,ebola"
+```
+
 ## License and copyright
 
 Copyright 2016 Trevor Bedford.
