@@ -60,7 +60,6 @@ Check out the code and branch.
 ```bash
 git clone --recursive https://github.com/nextstrain/janus.git
 cd janus
-git checkout rhino-deploy
 git submodule update --init --recursive
 ```
 
@@ -99,26 +98,21 @@ export NCBI_EMAIL=
 
 ### Usage
 
-Edit `config.json` to configure which viruses, lineages, and resolutions to
-build.
+The fike `config.json` stores information on which viruses, lineages, and resolutions to build. Builds can be specified with `--config builds="flu,zika"`.
+
+Perform a dry-run of the builds by printing the rules that will be executed
+for the configuration with `--dryrun`.
 
 ```bash
-vim config.json
-```
-
-Perform a dry-run of the builds by printing the rules that will be executed for
-the configuration.
-
-```bash
-./janus --dryrun
+./janus --dryrun --config builds="flu,zika"
 ```
 
 If everything looks good, run builds on the cluster. For example, the following
 command runs no more than 4 builds at a time. All arguments to `janus` are
-passed through to `snakemake`.
+passed through to `snakemake`. If `-j` is not specified, it defaults to `-j 1` with a single job run simultaneously.
 
 ```bash
-./janus -j 4
+./janus -j 4 --config builds="flu,zika"
 ```
 
 By default, all augur builds defined in `config["builds"]` will be built locally
@@ -135,18 +129,18 @@ corresponding auspice output to the development data bucket on S3. A
 corresponding development CloudFront account (e.g., `cloudfront=dev`).
 
 ```bash
-./janus -j 4 push --config builds="flu,zika,ebola" s3_bucket=nextstrain-dev-data
+./janus -j 4 push --config builds="flu,zika" s3_bucket=nextstrain-dev-data
 ```
 
 Use the `clean` rule to delete prepared, processed, and auspice files from one
 or more builds.
 
 ```bash
-./janus -j 1 clean --config builds="flu,zika,ebola"
+./janus -j 1 clean --config builds="flu,zika"
 ```
 
 ## License and copyright
 
-Copyright 2016 Trevor Bedford.
+Copyright 2016-2017 Trevor Bedford.
 
 Source code to nextstrain is made available under the terms of the [GNU Affero General Public License](LICENSE.txt) (AGPL). nextstrain is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
