@@ -186,7 +186,8 @@ def _get_fauna_lineage_argument(wildcards):
     if wildcards.virus == "dengue":
         # fauna download scripts for dengue expect a filter like "--select serotype:1".
         lineage_attribute = "serotype"
-        fauna_lineage = fauna_lineage.replace("denv", "")
+        if fauna_lineage is not None and "denv" in fauna_lineage:
+            fauna_lineage = fauna_lineage.replace("denv", "")
     else:
         lineage_attribute = "lineage"
 
