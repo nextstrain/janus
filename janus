@@ -4,5 +4,12 @@
 PATH="$HOME/miniconda3/bin:$PATH"
 source activate janus_python3
 
-# Run multiple build jobs at a time on the cluster.
-snakemake -w 60 --cluster-config cluster.json --drmaa " --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time}" --jobname "{rulename}.{jobid}.sh" $*
+# If a cluster submission command is on the PATH (e.g., sbatch or qsub), try to
+# submit jobs to the cluster. Otherwise, run jobs locally.
+if [[ ! -z "$(which sbatch)" || ! -z "$(which qsub)"  ]]
+then
+    # Run multiple build jobs at a time on the cluster.
+    snakemake -w 60 --cluster-config cluster.json --drmaa " --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time}" --jobname "{rulename}.{jobid}.sh" $*
+else
+    snakemake -w 60 $*
+fi
