@@ -12,7 +12,8 @@
         "time": "00:01:00"
     },
     "process_virus_lineage": {
-        "time": "02:00:00",
-        "memory": "4096"
+        "time": "24:00:00",
+        "memory": "8192",
+        "cores": 2
     }
 }
