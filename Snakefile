@@ -164,7 +164,7 @@ def _get_locus_argument(wildcards):
     segment name for fauna.
     """
     if hasattr(wildcards, "segment") and wildcards.segment != "all":
-        return "--select locus:%s" % wildcards.segment.upper()
+        return "locus:%s" % wildcards.segment.upper()
     else:
         return ""
 
@@ -192,9 +192,33 @@ def _get_fauna_lineage_argument(wildcards):
         lineage_attribute = "lineage"
 
     if fauna_lineage is not None:
-        return "--select %s:%s" % (lineage_attribute, fauna_lineage)
+        return "%s:%s" % (lineage_attribute, fauna_lineage)
     else:
         return ""
+
+def _get_strain_selection_filters(wildcards):
+    """Evaluates all available strain selection filters for a given virus/lineage
+    and returns the corresponding fauna download command line parameters for all
+    active filters.
+    """
+    # Find all filters for strain selection.
+    filters = [
+        _get_locus_argument(wildcards),
+        _get_fauna_lineage_argument(wildcards)
+    ]
+
+    # Get only active filters.
+    active_filters = [strain_filter
+                      for strain_filter in filters
+                      if strain_filter]
+
+    # Build the corresponding command line argument for active filters.
+    if len(active_filters) > 0:
+        strain_selection = "--select %s" % " ".join(active_filters)
+    else:
+        strain_selection = ""
+
+    return strain_selection
 
 def _get_fstem_argument(wildcards):
     """Return the filename stem for the current virus.
@@ -432,12 +456,11 @@ rule download_virus_lineage_sequences:
     log: "log/fauna_sequences_{virus}_{lineage}_{segment}.log"
     params:
         virus=_get_fauna_virus,
-        locus=_get_locus_argument,
-        fauna_lineage=_get_fauna_lineage_argument,
+        strain_selection=_get_strain_selection_filters,
         fstem=_get_fstem_argument,
         resolve_method=_get_resolve_method
     benchmark: "benchmarks/fauna_{virus}_{lineage}_{segment}_fasta.txt"
-    shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.locus} {params.fauna_lineage} {params.fstem} {params.resolve_method} &> {SNAKEMAKE_DIR}/{log}"
+    shell: "cd fauna && python vdb/{params.virus}_download.py -db vdb -v {params.virus} {params.strain_selection} {params.fstem} {params.resolve_method}"
 
 #
 # Clean up output files for quick rebuild without redownload
