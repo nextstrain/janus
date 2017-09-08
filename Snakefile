@@ -144,7 +144,7 @@ def _get_segment_argument_by_virus_lineage(wildcards):
     not define any segment.
     """
     if hasattr(wildcards, "segment") and wildcards.segment != "all":
-        return "--segments %s" % wildcards.segment
+        return "--segment %s" % wildcards.segment
     else:
         return ""
 
