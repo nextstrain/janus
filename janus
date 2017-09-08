@@ -1,8 +1,61 @@
 #!/bin/bash
 
+# Use the cluster by default.
+USE_CLUSTER=1
+
+# Parse user arguments.
+while getopts ":lh" opt; do
+    case $opt in
+        l)
+            # Run jobs locally.
+            USE_CLUSTER=0
+
+            # Remove janus argument from arguments passed to snakemake.
+            shift
+            ;;
+        h)
+            echo "Usage: $0 [-l] [snakemake arguments]"
+            echo
+            echo "-l: run jobs locally (default: run jobs on cluster)"
+            echo "all other arguments are passed through to snakemake"
+            echo
+            echo "Examples"
+            echo "--------"
+            echo
+            echo "Local run:"
+            echo -e "\t./janus -l"
+            echo "Dry run:"
+            echo -e "\t./janus -n"
+            echo "Run 4 jobs at once:"
+            echo -e "\t./janus -j 4"
+            echo "Run only flu and zika builds with 4 jobs at once:"
+            echo -e "\t./janus -j 4 --config builds=\"flu,zika\""
+            echo "Clean up prepare/process output for flu builds:"
+            echo -e "\t./janus clean -j 1 --config builds=\"flu\""
+            exit
+            ;;
+    esac
+done
+
+# If there are no cluster submission commands on the PATH, disable cluster
+# submission.
+if [[ -z "$(which sbatch)" && -z "$(which qsub)"  ]]
+then
+    USE_CLUSTER=0
+fi
+
 # Setup the environment.
 PATH="$HOME/miniconda3/bin:$PATH"
 source activate janus_python3
 
-# Run multiple build jobs at a time on the cluster.
-snakemake -w 60 --cluster-config cluster.json --drmaa " --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time}" --jobname "{rulename}.{jobid}.sh" $*
+# Run jobs on the cluster if it is possible and the user did not request a local
+# run.
+if [[ "${USE_CLUSTER}" -eq "1" ]]
+then
+    # Run multiple build jobs at a time on the cluster.
+    echo "Running on the cluster"
+    snakemake -w 60 --cluster-config cluster.json --drmaa " --nodes=1 --ntasks=1 --mem={cluster.memory} --cpus-per-task={cluster.cores} --tmp={cluster.disk} --time={cluster.time}" --jobname "{rulename}.{jobid}.sh" $*
+else
+    echo "Running locally"
+    snakemake -w 60 $*
+fi
