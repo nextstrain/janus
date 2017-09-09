@@ -63,6 +63,13 @@ cd janus
 git submodule update --init --recursive
 ```
 
+Or make sure to update to latest version.
+
+```bash
+git pull origin master
+git submodule update
+```
+
 Install Python environment.
 
 ```bash
