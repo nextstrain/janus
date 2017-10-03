@@ -36,5 +36,5 @@ conda env create -f envs/anaconda.python2.yaml
 source activate janus_python2
 CONDA_BIN_DIR=$(dirname `which conda`)
 rm -f ${CONDA_BIN_DIR}/raxml ${CONDA_BIN_DIR}/fasttree
-ln -s ${CONDA_BIN_DIR}/raxmlHPC ${CONDA_BIN_DIR}/raxml
+ln -s ${CONDA_BIN_DIR}/raxmlHPC-PTHREADS ${CONDA_BIN_DIR}/raxml
 ln -s ${CONDA_BIN_DIR}/FastTree ${CONDA_BIN_DIR}/fasttree
