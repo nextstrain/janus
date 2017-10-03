@@ -1,74 +1,28 @@
 {
-    "s3_bucket": "nextstrain-dev-data",
-    "cloudfront_ids": {
-        "dev": "E1XKGZG0ZTX4YN",
-        "pro": "E1ZD3XPSGXABBI"
-    },
     "builds": [
-        "avian",
-        "flu",
-        "dengue",
-        "ebola",
-        "zika"
-    ],
-    "viruses": {
-        "flu": {
-            "lineages": [
-                "h3n2"
-            ],
-            "h3n2": {
-                "resolutions": ["2y", "3y", "6y", "12y"],
-                "segments": ["ha"],
-                "viruses_per_month": {
-                    "2y": 90,
-                    "3y": 60,
-                    "6y": 24,
-                    "12y": 12
-                },
-                "sampling": "even",
-                "has_titers": true
-            }
+        {
+            "name": "{virus}",
+            "virus": ["zika", "ebola"]
         },
-        "zika": {
-            "viruses_per_month": 15,
-            "resolve_method": "choose_genbank",
-            "all": {
-            }
+        {
+            "name": "{virus}_{lineage}_{segment}_{resolution}",
+            "virus": ["flu"],
+            "lineage": ["h3n2", "h1n1pdm"],
+            "segment": ["ha"],
+            "resolution": ["3y", "6y"],
+            "prepare": "--sequences fauna/data/{lineage}.fasta --titers fauna/data/{lineage}_hi_titers.tsv",
+            "process": "--no_raxml --no_mut_freqs --no_tree_freqs"
         },
-        "ebola": {
-            "viruses_per_month": 100,
-            "resolve_method": "choose_genbank",
-            "all": {
-            }
-        },
-        "dengue": {
-            "lineages": [
-                "denv1",
-                "denv2",
-                "denv3",
-                "denv4"
-            ],
-            "viruses_per_month": 3,
-            "has_titers": true,
-            "process_arguments": "--no_tree_freqs --no_mut_freqs --no_titers"
-        },
-        "avian": {
-            "viruses_per_month": 0,
-            "lineages": [
-                "h7n9"
-            ],
-            "h7n9": {
-                "segments": [
-                    "pb2",
-                    "pb1",
-                    "pa",
-                    "ha",
-                    "np",
-                    "na",
-                    "mp",
-                    "ns"
-                ]
-            }
+        {
+            "name": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
+            "virus": ["flu"],
+            "lineage": ["h3n2", "h1n1pdm"],
+            "segment": ["ha"],
+            "resolution": ["3y", "6y"],
+            "passage": ["cell", "egg"],
+            "assay": ["hi", "fra"],
+            "prepare": "--sequences fauna/data/{lineage}.fasta --titers fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv",
+            "process": "--no_raxml"
         }
-    }
+    ]
 }
