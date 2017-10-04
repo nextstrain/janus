@@ -10,8 +10,7 @@
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
             "segment": ["ha"],
             "resolution": ["3y", "6y", "12y"],
-            "prepare": "--sequences ../../fauna/data/{lineage}.fasta --titers ../../fauna/data/{lineage}_hi_titers.tsv",
-            "process": "--no_raxml --no_mut_freqs --no_tree_freqs"
+            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_hi_titers.tsv --complete_frequencies"
         },
         {
             "name": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
@@ -21,8 +20,8 @@
             "resolution": ["3y", "6y", "12y"],
             "passage": ["cell", "egg"],
             "assay": ["hi", "fra"],
-            "prepare": "--sequences ../../fauna/data/{lineage}.fasta --titers ../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv",
-            "process": "--no_raxml --no_mut_freqs --no_tree_freqs"
+            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv --complete_frequencies",
+            "process": "--titers_export"
         }
     ]
 }
