@@ -1,8 +1,8 @@
-import itertools
 import fnmatch
 import os
 import snakemake.utils
-import string
+
+from builds import parse_variables_from_template, prepare_builds
 
 shell.prefix("source activate janus_python2; ")
 configfile: "config.json"
@@ -18,64 +18,6 @@ snakemake.utils.makedirs("log/cluster")
 #
 # Functions to prepare builds from config.
 #
-
-def parse_variables_from_template(template):
-    """Parses variables from template string and returns list of variable names.
-
-    >>> parse_variables_from_template("flu_h3n2")
-    []
-    >>> parse_variables_from_template("{virus}")
-    ['virus']
-    >>> parse_variables_from_template("{virus}_{lineage}")
-    ['virus', 'lineage']
-    """
-    formatter = string.Formatter()
-    return [item[1]
-            for item in list(formatter.parse(template))
-            if item[1] is not None]
-
-def prepare_builds(builds):
-    """Returns a list of complete build definitions for a given list of build templates.
-
-    >>> builds = prepare_builds([{"name": "{virus}", "virus": ["zika"]}])
-    >>> [sorted(build.items()) for name, build in builds.items()]
-    [[('name', 'zika'), ('virus', 'zika')]]
-    >>> builds = prepare_builds([{"name": "{virus}_{lineage}", "virus": ["zika"], "lineage": ["one", "two"]}])
-    >>> sorted(builds.keys())
-    ['zika_one', 'zika_two']
-    """
-    new_builds = {}
-
-    for build in builds:
-        # Find variables.
-        variables = set(parse_variables_from_template(build["name"]))
-        for key in build:
-            if isinstance(build[key], list):
-                variables.add(key)
-        variables = list(variables)
-
-        # Find non-variables.
-        non_variables = set(build.keys()) - set(variables + ["name"])
-
-        # Iterate through combinations of variables in nested for loop.
-        variable_product = list(itertools.product(*[build[variable] for variable in variables]))
-        named_variable_product = [dict(zip(variables, product)) for product in variable_product]
-
-        for product in named_variable_product:
-            # Create a dictionary from the current combination of variables
-            new_build = product
-
-            # Create a new name from the parent name field
-            new_build["name"] = build["name"].format(**product)
-
-            # String format each non-variable with the base dictionary and add to new dictionary
-            for non_variable in non_variables:
-                new_build[non_variable] = build[non_variable].format(**product)
-
-            # Create new build entry indexed by name with variable and non-variable dictionaries merged
-            new_builds[new_build["name"]] = new_build
-
-    return new_builds
 
 def _get_prepare_arguments(wildcards):
     """Build a string of command line arguments to run the given build through
