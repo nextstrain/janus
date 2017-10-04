@@ -5,10 +5,11 @@
             "virus": ["zika", "ebola"]
         },
         {
-            "name": "avian_h7n9",
+            "name": "avian_h7n9_{segments}",
             "virus": "avian",
             "lineage": "h7n9",
-            "prepare": "--segments pb2 pb1 pa ha np na mp ns"
+            "segments": ["pb2", "pb1", "pa", "ha", "np", "na", "mp", "ns"],
+            "prepare": "--sequences ../../../fauna/data/h7n9_{segments}.fasta"
         },
         {
             "name": "{virus}_{lineage}_{segment}_{resolution}",
