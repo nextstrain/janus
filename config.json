@@ -5,6 +5,12 @@
             "virus": ["zika", "ebola"]
         },
         {
+            "name": "avian_h7n9",
+            "virus": "avian",
+            "lineage": "h7n9",
+            "prepare": "--segments pb2 pb1 pa ha np na mp ns"
+        },
+        {
             "name": "{virus}_{lineage}_{segment}_{resolution}",
             "virus": ["flu"],
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
