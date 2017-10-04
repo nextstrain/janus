@@ -97,3 +97,11 @@ rule download:
         for virus in viruses:
             print("Downloading data for %s" % virus)
             shell("cd fauna && python download_all.py --virus %s --sequences --titers" % virus)
+
+rule clean:
+    run:
+        viruses = list(set([build["virus"] for build in BUILDS.values()]))
+        for virus in viruses:
+            shell("rm -rf augur/{virus}/prepared/*".format(virus=virus))
+            shell("rm -rf augur/{virus}/processed/*".format(virus=virus))
+            shell("rm -rf augur/{virus}/auspice/*".format(virus=virus))
