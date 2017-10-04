@@ -13,6 +13,7 @@
         },
         {
             "name": "{virus}_{lineage}_{segment}_{resolution}",
+            "description": "Live flu builds",
             "virus": ["flu"],
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
             "segment": ["ha"],
@@ -21,12 +22,25 @@
         },
         {
             "name": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
+            "description": "CDC flu HI builds",
             "virus": ["flu"],
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
             "segment": ["ha"],
             "resolution": ["3y", "6y", "12y"],
             "passage": ["cell", "egg"],
-            "assay": ["hi", "fra"],
+            "assay": ["hi"],
+            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv --complete_frequencies",
+            "process": "--titers_export"
+        },
+        {
+            "name": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
+            "description": "CDC H3N2 FRA builds",
+            "virus": ["flu"],
+            "lineage": ["h3n2"],
+            "segment": ["ha"],
+            "resolution": ["3y", "6y", "12y"],
+            "passage": ["cell", "egg"],
+            "assay": ["fra"],
             "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv --complete_frequencies",
             "process": "--titers_export"
         }
