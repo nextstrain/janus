@@ -2,7 +2,7 @@ import fnmatch
 import os
 import snakemake.utils
 
-from builds import parse_variables_from_template, prepare_builds
+from builds import prepare_builds
 
 shell.prefix("source activate janus_python2; ")
 configfile: "config.json"
