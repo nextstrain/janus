@@ -6,6 +6,7 @@ from builds import prepare_builds
 
 shell.prefix("source activate janus_python2; ")
 configfile: "config.json"
+localrules: prepare_virus_lineage, download, clean
 wildcard_constraints:
     virus="[a-zA-Z0-9]+"
 
