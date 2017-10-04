@@ -27,7 +27,7 @@ def _get_prepare_arguments(wildcards):
     params = [
         "lineage",
         "resolution",
-        "segment"
+        "segments"
     ]
 
     build = BUILDS[wildcards.name]
