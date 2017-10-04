@@ -47,10 +47,9 @@ def _get_process_arguments(wildcards):
     return BUILDS[wildcards.name].get("process", "")
 
 #
-# Prepare outputs.
+# Determine which builds to create.
 #
 
-# Determine which builds to create.
 BUILDS = prepare_builds(config["builds"])
 
 # Filter builds by command line constraints. Filters are defined by
@@ -67,27 +66,27 @@ if "filters" in config:
         if build_name not in included_builds:
             del BUILDS[build_name]
 
-rule all:
-    input: ["augur/%s/auspice/%s_meta.json" % (build["virus"], name) for name, build in BUILDS.items()]
-
 #
 # Prepare and process viruses by lineage.
 #
+
+rule all:
+    input: ["augur/%s/auspice/%s_meta.json" % (build["virus"], name) for name, build in BUILDS.items()]
 
 rule process_virus_lineage:
     input: "augur/{virus}/prepared/{name}.json"
     output: "augur/{virus}/auspice/{name}_meta.json"
     log: "log/process_{name}.log"
+    benchmark: "benchmarks/process_{name}.txt"
     params: arguments=_get_process_arguments
-    benchmark: "benchmarks/process/{name}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.process.py \
                   -j {SNAKEMAKE_DIR}/{input} {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
 rule prepare_virus_lineage:
     output: "augur/{virus}/prepared/{name}.json"
     log: "log/prepare_{name}.log"
+    benchmark: "benchmarks/prepare_{name}.txt"
     params: arguments=_get_prepare_arguments
-    benchmark: "benchmarks/prepare/{name}.txt"
     shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py \
                   --file_prefix {wildcards.name} \
                   {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
