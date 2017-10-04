@@ -72,23 +72,23 @@ if "filters" in config:
 #
 
 rule all:
-    input: ["augur/%s/auspice/%s_meta.json" % (build["virus"], name) for name, build in BUILDS.items()]
+    input: ["augur/builds/%s/auspice/%s_meta.json" % (build["virus"], name) for name, build in BUILDS.items()]
 
 rule process_virus_lineage:
-    input: "augur/{virus}/prepared/{name}.json"
-    output: "augur/{virus}/auspice/{name}_meta.json"
+    input: "augur/builds/{virus}/prepared/{name}.json"
+    output: "augur/builds/{virus}/auspice/{name}_meta.json"
     log: "log/process_{name}.log"
     benchmark: "benchmarks/process_{name}.txt"
     params: arguments=_get_process_arguments
-    shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.process.py \
+    shell: """cd augur/builds/{wildcards.virus} && python {wildcards.virus}.process.py \
                   -j {SNAKEMAKE_DIR}/{input} {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
 rule prepare_virus_lineage:
-    output: "augur/{virus}/prepared/{name}.json"
+    output: "augur/builds/{virus}/prepared/{name}.json"
     log: "log/prepare_{name}.log"
     benchmark: "benchmarks/prepare_{name}.txt"
     params: arguments=_get_prepare_arguments
-    shell: """cd augur/{wildcards.virus} && python {wildcards.virus}.prepare.py \
+    shell: """cd augur/builds/{wildcards.virus} && python {wildcards.virus}.prepare.py \
                   --file_prefix {wildcards.name} \
                   {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
@@ -103,6 +103,6 @@ rule clean:
     run:
         viruses = list(set([build["virus"] for build in BUILDS.values()]))
         for virus in viruses:
-            shell("rm -rf augur/{virus}/prepared/*".format(virus=virus))
-            shell("rm -rf augur/{virus}/processed/*".format(virus=virus))
-            shell("rm -rf augur/{virus}/auspice/*".format(virus=virus))
+            shell("rm -rf augur/builds/{virus}/prepared/*".format(virus=virus))
+            shell("rm -rf augur/builds/{virus}/processed/*".format(virus=virus))
+            shell("rm -rf augur/builds/{virus}/auspice/*".format(virus=virus))
