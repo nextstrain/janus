@@ -8,7 +8,7 @@ if [[ -z "$(which conda)" ]]
 then
     echo "Installing miniconda"
 
-    if [[ "$(uname -s)" -eq "Darwin" ]]
+    if [[ "$(uname -s)" = "Darwin" ]]
     then
         CONDA_SCRIPT=Miniconda3-latest-MacOSX-x86_64.sh
     else
