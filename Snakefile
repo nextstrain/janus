@@ -67,6 +67,10 @@ if "filters" in config:
         if build_name not in included_builds:
             del BUILDS[build_name]
 
+print("Found the following %i builds:" % len(BUILDS))
+for build_name in BUILDS:
+    print(" - %s" % build_name)
+
 #
 # Prepare and process viruses by lineage.
 #
