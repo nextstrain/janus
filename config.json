@@ -1,24 +1,24 @@
 {
     "builds": [
         {
-            "name": "{virus}",
+            "stem": "{virus}",
             "virus": ["zika", "ebola"]
         },
         {
-            "name": "avian_h7n9_{segments}",
+            "stem": "avian_h7n9_{segments}",
             "virus": "avian",
             "lineage": "h7n9",
             "segments": ["pb2", "pb1", "pa", "ha", "np", "na", "mp", "ns"],
             "prepare": "--sequences ../../../fauna/data/h7n9_{segments}.fasta"
         },
         {
-            "name": "dengue_{lineage}",
+            "stem": "dengue_{lineage}",
             "virus": "dengue",
             "lineage": ["all", "denv1", "denv2", "denv3", "denv4"],
             "process": "--no_titers"
         },
         {
-            "name": "{virus}_{lineage}_{segment}_{resolution}",
+            "stem": "{virus}_{lineage}_{segment}_{resolution}",
             "description": "Live flu builds",
             "virus": ["flu"],
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
@@ -27,7 +27,7 @@
             "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_hi_titers.tsv --complete_frequencies"
         },
         {
-            "name": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
+            "stem": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
             "description": "CDC flu HI builds",
             "virus": ["flu"],
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
@@ -39,7 +39,7 @@
             "process": "--titers_export"
         },
         {
-            "name": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
+            "stem": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
             "description": "CDC H3N2 FRA builds",
             "virus": ["flu"],
             "lineage": ["h3n2"],

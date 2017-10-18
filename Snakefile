@@ -30,7 +30,7 @@ def _get_prepare_arguments(wildcards):
         "segments"
     ]
 
-    build = BUILDS[wildcards.name]
+    build = BUILDS[wildcards.stem]
     arguments = []
     for param in params:
         if param in build:
@@ -45,7 +45,7 @@ def _get_process_arguments(wildcards):
     """Build a string of command line arguments to run the given build through
     augur's process step.
     """
-    return BUILDS[wildcards.name].get("process", "")
+    return BUILDS[wildcards.stem].get("process", "")
 
 #
 # Determine which builds to create.
@@ -57,43 +57,43 @@ BUILDS = prepare_builds(config["builds"])
 # comma-delimited wildcard patterns (e.g., "flu_*,zika").
 if "filters" in config:
     # Find builds that match filters.
-    build_names = list(BUILDS.keys())
+    build_stems = list(BUILDS.keys())
     filters = config["filters"].split(",")
-    included_builds = [build_name for build_name in build_names
-                       if any([fnmatch.fnmatch(build_name, pattern) for pattern in filters])]
+    included_builds = [build_stem for build_stem in build_stems
+                       if any([fnmatch.fnmatch(build_stem, pattern) for pattern in filters])]
 
     # Remove builds that don't match filters.
-    for build_name in build_names:
-        if build_name not in included_builds:
-            del BUILDS[build_name]
+    for build_stem in build_stems:
+        if build_stem not in included_builds:
+            del BUILDS[build_stem]
 
 print("Found the following %i builds:" % len(BUILDS))
-for build_name in BUILDS:
-    print(" - %s" % build_name)
+for build_stem in BUILDS:
+    print(" - %s" % build_stem)
 
 #
 # Prepare and process viruses by lineage.
 #
 
 rule all:
-    input: ["augur/builds/%s/auspice/%s_meta.json" % (build["virus"], name) for name, build in BUILDS.items()]
+    input: ["augur/builds/%s/auspice/%s_meta.json" % (build["virus"], stem) for stem, build in BUILDS.items()]
 
 rule process_virus_lineage:
-    input: "augur/builds/{virus}/prepared/{name}.json"
-    output: "augur/builds/{virus}/auspice/{name}_meta.json"
-    log: "log/process_{name}.log"
-    benchmark: "benchmarks/process_{name}.txt"
+    input: "augur/builds/{virus}/prepared/{stem}.json"
+    output: "augur/builds/{virus}/auspice/{stem}_meta.json"
+    log: "log/process_{stem}.log"
+    benchmark: "benchmarks/process_{stem}.txt"
     params: arguments=_get_process_arguments
     shell: """cd augur/builds/{wildcards.virus} && python {wildcards.virus}.process.py \
                   -j {SNAKEMAKE_DIR}/{input} {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
 rule prepare_virus_lineage:
-    output: "augur/builds/{virus}/prepared/{name}.json"
-    log: "log/prepare_{name}.log"
-    benchmark: "benchmarks/prepare_{name}.txt"
+    output: "augur/builds/{virus}/prepared/{stem}.json"
+    log: "log/prepare_{stem}.log"
+    benchmark: "benchmarks/prepare_{stem}.txt"
     params: arguments=_get_prepare_arguments
     shell: """cd augur/builds/{wildcards.virus} && python {wildcards.virus}.prepare.py \
-                  --file_prefix {wildcards.name} \
+                  --file_prefix {wildcards.stem} \
                   {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
 rule download:
