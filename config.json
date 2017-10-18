@@ -12,6 +12,12 @@
             "prepare": "--sequences ../../../fauna/data/h7n9_{segments}.fasta"
         },
         {
+            "name": "dengue_{lineage}",
+            "virus": "dengue",
+            "lineage": ["all", "denv1", "denv2", "denv3", "denv4"],
+            "process": "--no_titers"
+        },
+        {
             "name": "{virus}_{lineage}_{segment}_{resolution}",
             "description": "Live flu builds",
             "virus": ["flu"],
