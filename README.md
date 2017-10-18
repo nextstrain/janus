@@ -167,7 +167,7 @@ combinations of lineages and resolutions for seasonal flu.
             "virus": "flu",
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
             "resolution": ["3y", "6y", "12y"],
-            "segments": "ha"
+            "segments": "ha",
             "prepare": "--sequences ../fauna/{lineage}.fasta"
         }
     ]
@@ -191,7 +191,7 @@ passed to the process command with a `process` attribute as shown below.
 ```
 
 Users can define any additional attributes they need to parameterize their
-builds. For example, if a pathogen’s data is organized by serotype rather than
+builds. For example, if a pathogen’s data are organized by serotype rather than
 lineage, the maintainer for that pathogen can include a `serotype` variable in
 the `stem`, assign a corresponding list of values to a `serotype` attribute in
 the build definition, and provide the necessary `prepare` and `process`
