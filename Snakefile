@@ -84,7 +84,8 @@ rule push:
     params:
         bucket=config["s3_bucket"],
         paths=[path.replace("_meta", "_*") for path in OUTPUT_FILES]
-    log: "s3_push.log"
+    log: "log/s3_push.log"
+    benchmark: "benchmarks/s3_push.txt"
     shell: "python augur/scripts/s3.py -v push {params.bucket} {params.paths} &> {log}"
 
 rule all:
@@ -109,11 +110,14 @@ rule prepare_virus_lineage:
                   {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
 rule download:
+    benchmark: "benchmarks/fauna_download.txt"
+    log: "log/fauna_download.log"
     run:
+        shell("rm -f {log}")
         viruses = list(set([build["virus"] for build in BUILDS.values()]))
         for virus in viruses:
             print("Downloading data for %s" % virus)
-            shell("cd fauna && python download_all.py --virus %s --sequences --titers" % virus)
+            shell("cd fauna && python download_all.py --virus %s --sequences --titers >> {log}" % virus)
 
 rule clean:
     run:
