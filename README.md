@@ -251,8 +251,7 @@ command](http://snakemake.readthedocs.io/en/stable/executable.html).
 ./janus -n
 ```
 
-Run all builds on the cluster with no more than 4 cluster jobs at a time (note:
-the `-j` argument is required).
+Run all builds on the cluster with no more than 4 cluster jobs at a time.
 
 ```bash
 ./janus -j 4
@@ -274,9 +273,8 @@ module](https://docs.python.org/2/library/fnmatch.html).
 ./janus -j 4 --config filters="flu_h3n2*,zika"
 ```
 
-Filters also apply to all other rules including fauna downloads and the `clean`
-rule described later. The following command will only download H3N2 data from
-fauna.
+Filters also apply to all other rules including `download`, `push`, and
+`clean`. The following command will only download H3N2 data from fauna.
 
 ```bash
 ./janus download -j 4 --config filters="flu_h3n2*"
@@ -291,7 +289,7 @@ Run all builds defined in a custom configuration file.
 Remove all augur outputs for all builds.
 
 ```bash
-./janus clean -j 1
+./janus clean
 ```
 
 Alternately, force all existing augur outputs to be rebuilt.
@@ -299,6 +297,30 @@ Alternately, force all existing augur outputs to be rebuilt.
 ```bash
 ./janus -j 4 --forceall
 ```
+
+Push all auspice JSON files to the S3 bucket defined in the `s3_bucket`
+attribute of the `config.json` dictionary.
+
+```bash
+./janus push
+```
+
+Push only flu JSONs to the S3 bucket.
+
+```bash
+./janus push --config filters="flu_*"
+```
+
+### Debugging and benchmarking
+
+Standard out and error from all rules are written to files in the `log`
+directory. Fauna downloads write to `fauna_download.log`. Prepare and process
+write to `prepare_{stem}.log` and `process_{stem}.log`, respectively. The S3
+push script writes to `s3_push.log`.
+
+[Benchmark information from each rule](http://snakemake.readthedocs.io/en/stable/tutorial/additional_features.html#benchmarking) is
+written to files in the `benchmarks` directory. File names follow the same
+patterns as logs except using the `.txt` extension instead of `.log`.
 
 ### Cluster configuration
 
