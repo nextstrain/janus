@@ -6,7 +6,7 @@ from builds import prepare_builds
 
 shell.prefix("source activate janus_python2; ")
 configfile: "config.json"
-localrules: prepare_virus_lineage, download, clean
+localrules: prepare_virus_lineage, download, clean, push
 wildcard_constraints:
     virus="[a-zA-Z0-9]+"
 
@@ -75,8 +75,20 @@ for build_stem in BUILDS:
 # Prepare and process viruses by lineage.
 #
 
+OUTPUT_FILES = ["augur/builds/%s/auspice/%s_meta.json" % (build["virus"], stem)
+                for stem, build in BUILDS.items()]
+
+# Push all requested JSONs to a given S3 bucket.
+rule push:
+    input: OUTPUT_FILES
+    params:
+        bucket=config["s3_bucket"],
+        paths=[path.replace("_meta", "_*") for path in OUTPUT_FILES]
+    log: "s3_push.log"
+    shell: "python augur/scripts/s3.py -v push {params.bucket} {params.paths} &> {log}"
+
 rule all:
-    input: ["augur/builds/%s/auspice/%s_meta.json" % (build["virus"], stem) for stem, build in BUILDS.items()]
+    input: OUTPUT_FILES
 
 rule process_virus_lineage:
     input: "augur/builds/{virus}/prepared/{stem}.json"
