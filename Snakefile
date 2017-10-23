@@ -117,7 +117,7 @@ rule download:
         viruses = list(set([build["virus"] for build in BUILDS.values()]))
         for virus in viruses:
             print("Downloading data for %s" % virus)
-            shell("cd fauna && python download_all.py --virus %s --sequences --titers >> {log}" % virus)
+            shell("cd fauna && python download_all.py --virus %s --sequences --titers &>> {SNAKEMAKE_DIR}/{log}" % virus)
 
 rule clean:
     run:
