@@ -76,6 +76,8 @@ Install Python environment.
 ./install.sh
 ```
 
+*After this install the path to miniconda binaries (`~/miniconda3/bin`) needs to be added to `PATH` variable.*
+
 ### Environment configuration
 
 Define database environment variables `RETHINK_HOST`, `RETHINK_AUTH_KEY`, and
@@ -241,6 +243,8 @@ Download all data (sequences, titers, etc.) for the viruses listed in the
 ```bash
 ./janus download
 ```
+
+*This command is required to be run before running the further commands below.*
 
 Dry run all builds defined in the `config.json` file, printing all rules that
 would be run without running them. Note that all `janus` arguments except `-l`
