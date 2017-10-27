@@ -252,19 +252,19 @@ are passed directly to the [snakemake
 command](http://snakemake.readthedocs.io/en/stable/executable.html).
 
 ```bash
-./janus -n
+./janus -n build
 ```
 
 Run all builds on the cluster with no more than 4 cluster jobs at a time.
 
 ```bash
-./janus -j 4
+./janus -j 4 build
 ```
 
 Run all builds locally with no more than 4 jobs at a time.
 
 ```bash
-./janus -l -j 4
+./janus -l -j 4 build
 ```
 
 Run only H3N2 and Zika builds on the cluster. The `filters` configuration
@@ -274,7 +274,7 @@ are supported through the [fnmatch Python
 module](https://docs.python.org/2/library/fnmatch.html).
 
 ```bash
-./janus -j 4 --config filters="flu_h3n2*,zika"
+./janus -j 4 build --config filters="flu_h3n2*,zika"
 ```
 
 Filters also apply to all other rules including `download`, `push`, and
@@ -287,7 +287,7 @@ Filters also apply to all other rules including `download`, `push`, and
 Run all builds defined in a custom configuration file.
 
 ```bash
-./janus -j 4 --configfile experimental_builds.json
+./janus -j 4 build --configfile experimental_builds.json
 ```
 
 Remove all augur outputs for all builds.
@@ -299,7 +299,7 @@ Remove all augur outputs for all builds.
 Alternately, force all existing augur outputs to be rebuilt.
 
 ```bash
-./janus -j 4 --forceall
+./janus -j 4 build --forceall
 ```
 
 Push all auspice JSON files to the S3 bucket defined in the `s3_bucket`
