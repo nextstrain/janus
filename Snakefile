@@ -110,7 +110,6 @@ rule prepare_virus_lineage:
                   {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
 rule download:
-    benchmark: "benchmarks/fauna_download.txt"
     log: "log/fauna_download.log"
     run:
         shell("rm -f {log}")
