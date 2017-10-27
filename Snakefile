@@ -78,6 +78,9 @@ for build_stem in BUILDS:
 OUTPUT_FILES = ["augur/builds/%s/auspice/%s_meta.json" % (build["virus"], stem)
                 for stem, build in BUILDS.items()]
 
+rule build:
+    input: OUTPUT_FILES
+
 # Push all requested JSONs to a given S3 bucket.
 rule push:
     input: OUTPUT_FILES
@@ -87,9 +90,6 @@ rule push:
     log: "log/s3_push.log"
     benchmark: "benchmarks/s3_push.txt"
     shell: "python augur/scripts/s3.py -v push {params.bucket} {params.paths} &> {log}"
-
-rule all:
-    input: OUTPUT_FILES
 
 rule process_virus_lineage:
     input: "augur/builds/{virus}/prepared/{stem}.json"
