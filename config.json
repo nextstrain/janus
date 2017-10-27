@@ -6,6 +6,10 @@
             "virus": "zika"
         },
         {
+            "stem": "mumps",
+            "virus": "mumps"
+        },
+        {
             "stem": "ebola",
             "virus": "ebola"
         },
