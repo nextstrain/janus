@@ -1,2 +1,6 @@
 environment*
 .snakemake
+
+log
+benchmarks
+*.pyc
