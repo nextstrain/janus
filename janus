@@ -52,6 +52,10 @@ while getopts ":lh" opt; do
             echo -e "\t./janus clean -j 1 --config builds=\"flu\""
             exit
             ;;
+        \?)
+            # Stop looking for other arguments if we find an unexpected one.
+            break
+            ;;
     esac
 done
 
