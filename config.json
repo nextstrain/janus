@@ -1,74 +1,63 @@
 {
-    "s3_bucket": "nextstrain-dev-data",
-    "cloudfront_ids": {
-        "dev": "E1XKGZG0ZTX4YN",
-        "pro": "E1ZD3XPSGXABBI"
-    },
+    "s3_bucket": "nextstrain-staging",
     "builds": [
-        "avian",
-        "flu",
-        "dengue",
-        "ebola",
-        "zika"
-    ],
-    "viruses": {
-        "flu": {
-            "lineages": [
-                "h3n2"
-            ],
-            "h3n2": {
-                "resolutions": ["2y", "3y", "6y", "12y"],
-                "segments": ["ha"],
-                "viruses_per_month": {
-                    "2y": 90,
-                    "3y": 60,
-                    "6y": 24,
-                    "12y": 12
-                },
-                "sampling": "even",
-                "has_titers": true
-            }
+        {
+            "stem": "zika",
+            "virus": "zika"
         },
-        "zika": {
-            "viruses_per_month": 15,
-            "resolve_method": "choose_genbank",
-            "all": {
-            }
+        {
+            "stem": "mumps",
+            "virus": "mumps"
         },
-        "ebola": {
-            "viruses_per_month": 100,
-            "resolve_method": "choose_genbank",
-            "all": {
-            }
+        {
+            "stem": "ebola",
+            "virus": "ebola"
         },
-        "dengue": {
-            "lineages": [
-                "denv1",
-                "denv2",
-                "denv3",
-                "denv4"
-            ],
-            "viruses_per_month": 3,
-            "has_titers": true,
-            "process_arguments": "--no_tree_freqs --no_mut_freqs --no_titers"
+        {
+            "stem": "avian_h7n9_{segments}",
+            "virus": "avian",
+            "lineage": "h7n9",
+            "segments": ["pb2", "pb1", "pa", "ha", "np", "na", "mp", "ns"],
+            "prepare": "--sequences ../../../fauna/data/h7n9_{segments}.fasta"
         },
-        "avian": {
-            "viruses_per_month": 0,
-            "lineages": [
-                "h7n9"
-            ],
-            "h7n9": {
-                "segments": [
-                    "pb2",
-                    "pb1",
-                    "pa",
-                    "ha",
-                    "np",
-                    "na",
-                    "mp",
-                    "ns"
-                ]
-            }
+        {
+            "stem": "dengue_{lineage}",
+            "virus": "dengue",
+            "lineage": ["all", "denv1", "denv2", "denv3", "denv4"],
+            "process": "--no_titers"
+        },
+        {
+            "stem": "{virus}_{lineage}_{segment}_{resolution}",
+            "description": "Live flu builds",
+            "virus": ["flu"],
+            "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
+            "segment": ["ha"],
+            "resolution": ["3y", "6y", "12y"],
+            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_hi_titers.tsv --complete_frequencies"
+        },
+        {
+            "stem": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
+            "description": "CDC flu HI builds",
+            "virus": ["flu"],
+            "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
+            "segment": ["ha"],
+            "resolution": ["3y", "6y", "12y"],
+            "passage": ["cell", "egg"],
+            "assay": ["hi"],
+            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv --complete_frequencies",
+            "process": "--titers_export"
+        },
+        {
+            "stem": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
+            "description": "CDC H3N2 FRA builds",
+            "virus": ["flu"],
+            "lineage": ["h3n2"],
+            "segment": ["ha"],
+            "resolution": ["3y", "6y", "12y"],
+            "passage": ["cell", "egg"],
+            "assay": ["fra"],
+            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv --complete_frequencies",
+            "process": "--titers_export"
         }
-    }
+    ]
 }

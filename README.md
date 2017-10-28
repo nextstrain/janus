@@ -76,74 +76,273 @@ Install Python environment.
 ./install.sh
 ```
 
-### Configuration
+*After this install the path to miniconda binaries (`~/miniconda3/bin`) needs to be added to `PATH` variable.*
 
-Setup AWS credentials before the first Janus run.
+### Environment configuration
 
-```bash
-mkdir ~/.aws
-chmod 700 ~/.aws
-touch ~/.aws/credentials
-chmod 600 ~/.aws/credentials
+Define database environment variables `RETHINK_HOST`, `RETHINK_AUTH_KEY`, and
+`NCBI_EMAIL` before trying to download data with fauna.
+
+Define AWS credentials in the `AWS_SECRET_ACCESS_KEY` and `AWS_ACCESS_KEY_ID`
+environment variables before trying to push auspice results to S3.
+
+### Build configuration
+
+Janus uses a JSON configuration file to define a list of one or more augur
+builds to run (e.g., `zika`, `ebola`, or `flu_h3n2_ha_3y`). The configuration
+file must provide a `builds` attribute with a corresponding list of one or more
+build definitions. The following is an example empty configuration.
+
+```json
+{
+    "builds": [
+    ]
+}
 ```
 
-Add a `nextstrain` profile to the credentials file.
+Builds are defined as dictionaries with two or more attributes. Each build
+requires a `stem` that specifies the names of the augur output files and a
+`virus` that corresponds to a virus supported by both fauna and augur. The
+`virus` attribute specifically enables running the appropriate augur scripts
+(e.g., `builds/{virus}/{virus}.prepare.py`). For example, the following
+configuration defines a build instance for Zika that runs augur with default
+parameters.
 
-```ini
-[nextstrain]
-aws_access_key_id =
-aws_secret_access_key =
+```json
+{
+    "builds": [
+        {
+            "stem": "zika",
+            "virus": "zika"
+        }
+    ]
+}
 ```
 
-Set database variables in the environment before each Janus run.
+Builds can be defined as individual build instances, as shown above, or as build
+templates that Janus expands to one or more individual build instances. Build
+templates define variables with Python named string formatting in the `stem` and
+matching attributes in the build definition. Variable attributes provide lists
+of values to substitute in the `stem` and other optional non-list
+attributes. The following example defines one build template with a variable
+named `virus` and a list of two viruses to create individual build instances
+for.
 
-```bash
-export RETHINK_HOST=
-export RETHINK_AUTH_KEY=
-export NCBI_EMAIL=
+```json
+{
+    "builds": [
+        {
+            "stem": "{virus}",
+            "virus": ["zika", "ebola"]
+        }
+    ]
+}
 ```
+
+Variables can be expanded into other non-list attributes of the build template
+to customize parameters for augur’s prepare and process commands. For example,
+the following build template uses the `virus` variable to specify which
+sequences should be included when running the augur prepare command.
+
+```json
+{
+    "builds": [
+        {
+            "stem": "{virus}",
+            "virus": ["zika", "ebola"],
+            "prepare": "--sequences ../fauna/{virus}.fasta"
+        }
+    ]
+}
+```
+
+When multiple variables are defined in the `stem`, one build instance is created
+for each combination of variable values. For example, the following build
+template uses `lineage` and `resolution` variables to create all 12 possible
+combinations of lineages and resolutions for seasonal flu.
+
+```json
+{
+    "builds": [
+        {
+            "stem": "flu_{lineage}_ha_{resolution}",
+            "virus": "flu",
+            "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
+            "resolution": ["3y", "6y", "12y"],
+            "segments": "ha",
+            "prepare": "--sequences ../fauna/{lineage}.fasta"
+        }
+    ]
+}
+```
+
+As shown above, specific arguments can be passed directly to the augur prepare
+command with the `prepare` attribute. Similarly, specific arguments can be
+passed to the process command with a `process` attribute as shown below.
+
+```json
+{
+    "builds": [
+        {
+            "stem": "zika",
+            "virus": "zika",
+            "process": "--no_raxml"
+        }
+    ]
+}
+```
+
+Users can define any additional attributes they need to parameterize their
+builds. For example, if a pathogen’s data are organized by serotype rather than
+lineage, the maintainer for that pathogen can include a `serotype` variable in
+the `stem`, assign a corresponding list of values to a `serotype` attribute in
+the build definition, and provide the necessary `prepare` and `process`
+arguments to run the build(s) correctly. The following configuration shows an
+example of this approach with dengue virus.
+
+```json
+{
+    "builds": [
+        {
+            "stem": "dengue_{serotype}",
+            "virus": "dengue",
+            "serotype": ["denv1", "denv2", "denv3", "denv4"],
+            "prepare": "--serotype {serotype}"
+        }
+    ]
+}
+```
+
+The complete set of attributes expected by Janus is listed below.
+
+Required attributes:
+
+  * `stem`: Name or name template for the build, used as the file prefix for augur outputs
+  * `virus`: Name of a virus supported by fauna and augur
+
+Optional attributes for augur prepare:
+
+  * `lineage`: String or list of strings defining viral lineages to pass to the prepare script as `--lineages {lineage}`
+  * `segments`: String or list of strings defining viral segments to pass to the prepare script as `--segments {segments}`
+  * `resolution`: String or list of strings defining viral resolutions to pass to the prepare script as `--resolution {resolution}`
+  * `prepare`: String of parameters to pass to the virus’s augur prepare command
+
+Optional attributes for augur process:
+
+  * `process`: String of parameters to pass to the virus’s augur process command
+
+Other optional attributes:
+
+  * `description`: String describing the build(s) represented by the build definition (e.g., “Flu builds for nextstrain.org”)
 
 ### Usage
 
-The fike `config.json` stores information on which viruses, lineages, and resolutions to build. Builds can be specified with `--config builds="flu,zika"`.
-
-Perform a dry-run of the builds by printing the rules that will be executed
-for the configuration with `--dryrun`.
+Download all data (sequences, titers, etc.) for the viruses listed in the
+`config.json` file using fauna.
 
 ```bash
-./janus --dryrun --config builds="flu,zika"
+./janus download
 ```
 
-If everything looks good, run builds on the cluster. For example, the following
-command runs no more than 4 builds at a time. All arguments to `janus` are
-passed through to `snakemake`. If `-j` is not specified, it defaults to `-j 1` with a single job run simultaneously.
+*This command is required to be run before running the further commands below.*
+
+Dry run all builds defined in the `config.json` file, printing all rules that
+would be run without running them. Note that all `janus` arguments except `-l`
+are passed directly to the [snakemake
+command](http://snakemake.readthedocs.io/en/stable/executable.html).
 
 ```bash
-./janus -j 4 --config builds="flu,zika"
+./janus -n build
 ```
 
-By default, all augur builds defined in `config["builds"]` will be built locally
-and not synced to S3. Use the `push` rule to build one or more specific viruses
-and push them to S3.
+Run all builds on the cluster with no more than 4 cluster jobs at a time.
 
 ```bash
-./janus -j 4 push
+./janus -j 4 build
 ```
 
-The following command builds seasonal flu, Zika, and Ebola files and pushes the
-corresponding auspice output to the development data bucket on S3. A
-`cloudfront` argument can be added to create an invalidation request for the
-corresponding development CloudFront account (e.g., `cloudfront=dev`).
+Run all builds locally with no more than 4 jobs at a time.
 
 ```bash
-./janus -j 4 push --config builds="flu,zika" s3_bucket=nextstrain-dev-data
+./janus -l -j 4 build
 ```
 
-Use the `clean` rule to delete prepared, processed, and auspice files from one
-or more builds.
+Run only H3N2 and Zika builds on the cluster. The `filters` configuration
+parameter supports a comma-delimited list of patterns to match in the complete
+list of build stems defined in the configuration file. Standard UNIX wildcards
+are supported through the [fnmatch Python
+module](https://docs.python.org/2/library/fnmatch.html).
 
 ```bash
-./janus -j 1 clean --config builds="flu,zika"
+./janus -j 4 build --config filters="flu_h3n2*,zika"
+```
+
+Filters also apply to all other rules including `download`, `push`, and
+`clean`. The following command will only download H3N2 data from fauna.
+
+```bash
+./janus download -j 4 --config filters="flu_h3n2*"
+```
+
+Run all builds defined in a custom configuration file.
+
+```bash
+./janus -j 4 build --configfile experimental_builds.json
+```
+
+Remove all augur outputs for all builds.
+
+```bash
+./janus clean
+```
+
+Alternately, force all existing augur outputs to be rebuilt.
+
+```bash
+./janus -j 4 build --forceall
+```
+
+Push all auspice JSON files to the S3 bucket defined in the `s3_bucket`
+attribute of the `config.json` dictionary.
+
+```bash
+./janus push
+```
+
+Push only flu JSONs to the S3 bucket.
+
+```bash
+./janus push --config filters="flu_*"
+```
+
+### Debugging and benchmarking
+
+Standard out and error from all rules are written to files in the `log`
+directory. Fauna downloads write to `fauna_download.log`. Prepare and process
+write to `prepare_{stem}.log` and `process_{stem}.log`, respectively. The S3
+push script writes to `s3_push.log`.
+
+[Benchmark information from each rule](http://snakemake.readthedocs.io/en/stable/tutorial/additional_features.html#benchmarking) is
+written to files in the `benchmarks` directory. File names follow the same
+patterns as logs except using the `.txt` extension instead of `.log`.
+
+### Cluster configuration
+
+The `janus` script is a wrapper for Snakemake that submits jobs to a SLURM
+cluster using the [DRMAA Python
+bindings](http://drmaa-python.readthedocs.io/en/latest/). Job requirements
+(e.g., number of CPUs, memory, etc.) are defined in the `cluster.json` file as
+described in [the Snakemake
+documentation](http://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
+
+To run builds on [any other supported
+cluster](http://snakemake.readthedocs.io/en/stable/tutorial/additional_features.html#cluster-execution),
+load the Janus Python 3 environment and run Snakemake directly. For example, the
+following command will run all builds on a Grid Engine-style cluster.
+
+```bash
+source activate janus_python3
+snakemake -j 4 --cluster "qsub"
 ```
 
 ## License and copyright
