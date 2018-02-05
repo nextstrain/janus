@@ -248,7 +248,7 @@ Download all data (sequences, titers, etc.) for the viruses listed in the
 ./janus download
 ```
 
-*This command is required to be run before running the further commands below.*
+*The download command is required to be run before running the further commands below.*
 
 Dry run all builds defined in the `config.json` file, printing all rules that
 would be run without running them. Note that all `janus` arguments except `-l`
