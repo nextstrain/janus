@@ -45,9 +45,10 @@ def prepare_builds(builds):
         # Find variables in build stem template.
         variables = parse_variables_from_template(build["stem"])
 
-        # Confirm that all variables are defined as lists in the config.
+        # Make sure that all variables are defined as lists in the config.
         for variable in variables:
-            assert isinstance(build[variable], list), "Variable '%s' is not a list: '%s'" % (variable, build[variable])
+            if not isinstance(build[variable], list):
+                build[variable] = [build[variable]]
 
         # Find non-variables.
         non_variables = set(build.keys()) - set(variables + ["stem"])
