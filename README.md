@@ -231,6 +231,10 @@ Optional attributes for augur process:
 
   * `process`: String of parameters to pass to the virus’s augur process command
 
+Optional attributes for fauna:
+
+  * `fauna`: String of parameters to pass to fauna's `download_all.py` script. Defaults to "--virus {virus} --sequences".
+
 Other optional attributes:
 
   * `description`: String describing the build(s) represented by the build definition (e.g., “Flu builds for nextstrain.org”)

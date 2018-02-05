@@ -110,13 +110,21 @@ rule prepare_virus_lineage:
                   {params.arguments} &> {SNAKEMAKE_DIR}/{log}"""
 
 rule download:
-    log: "log/fauna_download.log"
     run:
-        shell("rm -f {log}")
-        viruses = list(set([build["virus"] for build in BUILDS.values()]))
-        for virus in viruses:
-            print("Downloading data for %s" % virus)
-            shell("cd fauna && python download_all.py --virus %s --sequences --titers >> {SNAKEMAKE_DIR}/{log}" % virus)
+        # Find all unique fauna commands to run.
+        all_fauna_args = set()
+        for build in BUILDS.values():
+            if "fauna" in build:
+                fauna_args = build["fauna"]
+            else:
+                fauna_args = "--virus %s --sequences" % build["virus"]
+
+            all_fauna_args.add(fauna_args)
+
+        # Run unique fauna commands.
+        for fauna_args in all_fauna_args:
+            print("Fauna args: %s" % fauna_args)
+            shell("cd fauna && python download_all.py %s" % fauna_args)
 
 rule clean:
     run:
