@@ -40,7 +40,25 @@ Install Python environment.
 
 *After this install the path to miniconda binaries (`~/miniconda3/bin`) needs to be added to `PATH` variable.*
 
-### Environment configuration
+## Quickstart
+
+Set fauna environment variables (`RETHINK_HOST` and `RETHINK_AUTH_KEY`).
+
+Download data.
+
+```bash
+./janus download --config filters="zika"
+```
+
+Run augur.
+
+```bash
+./janus --config filters="zika"
+```
+
+Inspect output in `augur/builds/zika/auspice`.
+
+## Environment configuration
 
 Define database environment variables `RETHINK_HOST`, `RETHINK_AUTH_KEY`, and
 `NCBI_EMAIL` before trying to download data with fauna.
