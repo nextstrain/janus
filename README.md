@@ -15,45 +15,7 @@ nextstrain is comprised of four components:
 
 This repo is intended to ease deployment of nextstrain instances. It's goal is to provide deploy scripts for augur builds.
 
-## Docker commands
-
-Build base Docker image
-
-    docker build -t nextstrain/base:latest -f Dockerfile.base .
-
-Push base image to hub
-
-    docker push nextstrain/base:latest
-
-Build janus Docker image
-
-    docker build -t nextstrain/janus:latest .
-
-Push janus image to hub
-
-    docker push nextstrain/janus:latest
-
-Run a shell from within the container
-
-    docker run -t -i nextstrain/janus /bin/bash
-
-Run a shell from within the container, including environment variables
-
-    docker run -t -i --env-file environment_janus.env nextstrain/janus /bin/bash
-
-## Testing
-
-Enter shell
-
-    docker run -t -i --env-file environment_janus.env nextstrain/janus /bin/bash
-
-Build Zika
-
-    python build.py
-
-## Building with Snakemake
-
-### Installation
+## Installation
 
 Check out the code and branch.
 
