@@ -66,7 +66,7 @@ Define database environment variables `RETHINK_HOST`, `RETHINK_AUTH_KEY`, and
 Define AWS credentials in the `AWS_SECRET_ACCESS_KEY` and `AWS_ACCESS_KEY_ID`
 environment variables before trying to push auspice results to S3.
 
-### Build configuration
+## Build configuration
 
 Janus uses a JSON configuration file to define a list of one or more augur
 builds to run (e.g., `zika`, `ebola`, or `flu_h3n2_ha_3y`). The configuration
@@ -219,7 +219,7 @@ Other optional attributes:
 
   * `description`: String describing the build(s) represented by the build definition (e.g., “Flu builds for nextstrain.org”)
 
-### Usage
+## Usage
 
 Download all data (sequences, titers, etc.) for the viruses listed in the
 `config.json` file using fauna.
@@ -299,7 +299,7 @@ Push only flu JSONs to the S3 bucket.
 ./janus push --config filters="flu_*"
 ```
 
-### Debugging and benchmarking
+## Debugging and benchmarking
 
 Standard out and error from all rules are written to files in the `log`
 directory. Fauna downloads write to `fauna_download.log`. Prepare and process
@@ -310,7 +310,7 @@ push script writes to `s3_push.log`.
 written to files in the `benchmarks` directory. File names follow the same
 patterns as logs except using the `.txt` extension instead of `.log`.
 
-### Cluster configuration
+## Cluster configuration
 
 The `janus` script is a wrapper for Snakemake that submits jobs to a SLURM
 cluster using the [DRMAA Python
