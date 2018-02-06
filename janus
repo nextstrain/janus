@@ -46,10 +46,12 @@ while getopts ":lh" opt; do
             echo -e "\t./janus -n"
             echo "Run 4 jobs at once:"
             echo -e "\t./janus -j 4"
-            echo "Run only flu and zika builds with 4 jobs at once:"
-            echo -e "\t./janus -j 4 --config builds=\"flu,zika\""
             echo "Clean up prepare/process output for flu builds:"
-            echo -e "\t./janus clean -j 1 --config builds=\"flu\""
+            echo -e "\t./janus clean -j 1 --config filters=\"flu*\""
+            echo "Clean up prepare/process output for H3N2 flu builds:"
+            echo -e "\t./janus clean -j 1 --config filters=\"flu_h3n2*\""
+            echo "Run only flu and zika builds with 4 jobs at once:"
+            echo -e "\t./janus -j 4 --config filters=\"flu*,zika\""
             exit
             ;;
         \?)
