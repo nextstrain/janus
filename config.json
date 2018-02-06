@@ -33,7 +33,8 @@
             "lineage": ["h3n2", "h1n1pdm", "vic", "yam"],
             "segment": ["ha"],
             "resolution": ["3y", "6y", "12y"],
-            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_hi_titers.tsv --complete_frequencies"
+            "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_hi_titers.tsv --complete_frequencies",
+            "fauna": " --virus {virus} --segments {segment} --sequences --titers"
         },
         {
             "stem": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
@@ -45,7 +46,8 @@
             "passage": ["cell", "egg"],
             "assay": ["hi"],
             "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv --complete_frequencies",
-            "process": "--titers_export"
+            "process": "--titers_export",
+            "fauna": " --virus {virus} --segments {segment} --sequences --titers"
         },
         {
             "stem": "{virus}_{lineage}_{segment}_{resolution}_{passage}_{assay}",
@@ -57,7 +59,8 @@
             "passage": ["cell", "egg"],
             "assay": ["fra"],
             "prepare": "--sequences ../../../fauna/data/{lineage}.fasta --titers ../../../fauna/data/{lineage}_cdc_{assay}_{passage}_titers.tsv --complete_frequencies",
-            "process": "--titers_export"
+            "process": "--titers_export",
+            "fauna": " --virus {virus} --segments {segment} --sequences --titers"
         }
     ]
 }
