@@ -1,3 +1,7 @@
+## Note about deprecation
+
+This project has been deprecated and superseded by the [nextstrain/cli](https://github.com/nextstrain/cli).
+
 ## Introduction
 
 The nextstrain project is an attempt to make flexible informatic pipelines and visualization tools to track ongoing pathogen evolution as sequence data emerges. The nextstrain project derives from [nextflu](https://github.com/blab/nextflu), which was specific to influenza evolution.
